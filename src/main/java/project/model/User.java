@@ -6,8 +6,6 @@ public class User {
     private String firstName;
     private String lastName;
 
-
-
     //Getters & Setters
     public String getUsername() {
         return username;
@@ -40,4 +38,6 @@ public class User {
     public void setLastName(String lastName) {
         this.lastName = lastName;
     }
+
+
 }

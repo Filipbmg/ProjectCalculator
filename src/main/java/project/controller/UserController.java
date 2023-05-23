@@ -1,12 +1,16 @@
 package project.controller;
 
+import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
-import project.model.User;
+import project.model.*;
+import org.springframework.ui.Model;
 import project.repository.UserRepository;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 @Controller
 public class UserController {
@@ -48,7 +52,6 @@ public class UserController {
                 return "redirect:/fejlunderoprettelse";
             }
         }
-
         User newUser = new User();
         newUser.setUsername(request.getParameter("username"));
         newUser.setPassword(request.getParameter("password"));
@@ -57,11 +60,9 @@ public class UserController {
 
         //Undersøger om brugernavn eller kodeord er for kort.
         if (newUser.getUsername().length() < 3 || newUser.getPassword().length() < 3){
-            System.out.println("Password or username too short");
             return "redirect:/fejlunderoprettelse";
         } else {
             if (userRepo.checkIfDup(newUser)) {
-                System.out.println("Username taken");
                 return "redirect:/fejlunderoprettelse";
             } else {
                 userRepo.addUser(newUser);
@@ -70,17 +71,27 @@ public class UserController {
         }
     }
 
-    @PostMapping("/login")
-    public String login(WebRequest request) {
+
+    //Login og vis brugerens projekter
+    @PostMapping("/projekter")
+    public String login(WebRequest request, HttpSession session, Model model) {
         User userLogin = new User();
         userLogin.setUsername(request.getParameter("username"));
         userLogin.setPassword(request.getParameter("password"));
         if (userRepo.verifyLogin(userLogin)) {
-            return "redirect:/projekter";
+            List<Project> projectList = new ArrayList<>(userRepo.fetchProjects(userLogin));
+            model.addAttribute("projects", projectList);
+            session.setAttribute("username", userLogin.getUsername());
+            session.setAttribute("userId", userRepo.getUserId(userLogin));
+            return "projekter";
         } else {
             return "login";
         }
     }
+
+
+
+
 
 
 }

@@ -4,10 +4,12 @@ package project.repository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 import project.model.User;
+import project.model.Project;
 import project.utility.ConnectionManager;
 
-import jakarta.servlet.http.HttpSession;
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Repository
 public class UserRepository {
@@ -35,7 +37,6 @@ public class UserRepository {
             //returner true hvis brugernavnet er i databasen allerede
             return result.next();
         } catch (SQLException e) {
-            System.out.println("Error while checking for duplicates");
             e.printStackTrace();
         }
         return false;
@@ -57,7 +58,6 @@ public class UserRepository {
             //execute
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
-            System.out.println("Error during user creation");
             e.printStackTrace();
         }
     }
@@ -77,10 +77,59 @@ public class UserRepository {
 
             return result.next();
         } catch (SQLException e) {
-            System.out.println("Fejl under login");
             e.printStackTrace();
         }
         return false;
+    }
+
+    public List<Project> fetchProjects(User user){
+        List<Project> projectList = new ArrayList<>();
+        try{
+            //connect to db
+            Connection connection = ConnectionManager.getConnection(dbUrl, username, password);
+
+            //Brug brugernavn til at få projekt id, navn og projekt ejer id på alle projekter brugeren er en del af
+            String query = "SELECT projects.id, projects.project_name, projects.owner_id FROM projects " +
+                    "JOIN project_users ON projects.id = project_users.project_id " +
+                    "JOIN users ON project_users.user_id = users.id " +
+                    "WHERE users.username = ?";
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setString(1, user.getUsername());
+            ResultSet projectResults = preparedStatement.executeQuery();
+            while (projectResults.next()) {
+                int projectId = projectResults.getInt("id");
+                String projectName = projectResults.getString("project_name");
+                int ownerId = projectResults.getInt("owner_id");
+                Project projectInfo = new Project(projectId, projectName, ownerId);
+                projectList.add(projectInfo);
+            }
+            return projectList;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return projectList;
+    }
+
+    public int getUserId(User user) {
+        int userId = 0;
+        try {
+            //connect to db
+            Connection connection = ConnectionManager.getConnection(dbUrl, username, password);
+            PreparedStatement preparedStatement = connection.prepareStatement("SELECT id FROM users WHERE username = ?");
+
+            //set attribute in prepared statement
+            preparedStatement.setString(1, user.getUsername());
+
+            //execute
+            ResultSet result = preparedStatement.executeQuery();
+            if (result.next()) {
+                userId = result.getInt("id");
+            }
+            return userId;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return userId;
     }
 
 }

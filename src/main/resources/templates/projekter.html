@@ -1,11 +1,39 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="da" xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
+    <link rel="stylesheet" th:href="@{css/style.css}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@400;700&display=swap" rel="stylesheet">
     <title>Projekter</title>
+    <style>
+        body {
+            font-family: 'Source Sans Pro', sans-serif;
+            background-color: #f0f2f5;
+        }
+    </style>
 </head>
 <body>
-<a>Projekter</a>
-
+<div class="navbar">
+    <div class="logo">
+        <a><h1>Ønskelisten</h1></a>
+    </div>
+    <form action="/logout" method="POST">
+        <button type="submit" class="logout-button">Log af</button>
+    </form>
+</div>
+<div class="main">
+    <h1>Projekter</h1>
+    <ul>
+        <li th:each="project : ${projects}">
+            <a th:href="@{|/projektdetaljer/${project.projectId}|}">
+                <span th:text="${project.projectId} + ${project.projectName} +${project.ownerId}"></span>
+            </a>
+        </li>
+    </ul>
+    <p>Session Attribute: <span th:text="${session.userId}"></span></p>
+</div>
 </body>
 </html>
