@@ -17,13 +17,13 @@
 <body>
 <div class="navbar">
   <div class="logo">
-    <a><h1>Ønskelisten</h1></a>
+    <a><h1>Projekt-Manager</h1></a>
   </div>
 </div>
 <div class="main">
-  <h2>Fejl I oprettelsen</h2>
-  <h3>Enten var brugernavn/Kodeord for kort(Min. 3 tegn), eller også er brugernavnet allerede taget.</h3>
+  <h2 style="text-align: center;">Fejl under oprettelsen</h2>
   <div class="container">
+    <p th:text="${errorMessage}"></p>
     <form action="/nybruger" method="GET">
       <a th:href="@{/nybruger}"><button type="button">Prøv Igen</button></a>
     </form>

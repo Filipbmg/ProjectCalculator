@@ -8,6 +8,7 @@ import project.model.Project;
 import project.utility.ConnectionManager;
 
 import java.sql.*;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -82,17 +83,18 @@ public class UserRepository {
         return false;
     }
 
-    public List<Project> fetchProjects(User user){
+    public List<Project> getProjects(User user){
         List<Project> projectList = new ArrayList<>();
         try{
             //connect to db
             Connection connection = ConnectionManager.getConnection(dbUrl, username, password);
 
             //Brug brugernavn til at få projekt id, navn og projekt ejer id på alle projekter brugeren er en del af
-            String query = "SELECT projects.id, projects.project_name, projects.owner_id FROM projects " +
+            String query = "SELECT projects.id, projects.project_name, projects.owner_id, projects.deadline FROM projects " +
                     "JOIN project_users ON projects.id = project_users.project_id " +
                     "JOIN users ON project_users.user_id = users.id " +
-                    "WHERE users.username = ?";
+                    "WHERE users.username = ? " +
+                    "ORDER BY projects.deadline";
             PreparedStatement preparedStatement = connection.prepareStatement(query);
             preparedStatement.setString(1, user.getUsername());
             ResultSet projectResults = preparedStatement.executeQuery();
@@ -100,7 +102,12 @@ public class UserRepository {
                 int projectId = projectResults.getInt("id");
                 String projectName = projectResults.getString("project_name");
                 int ownerId = projectResults.getInt("owner_id");
-                Project projectInfo = new Project(projectId, projectName, ownerId);
+                LocalDate deadline = projectResults.getDate("deadline").toLocalDate();
+                Project projectInfo = new Project();
+                projectInfo.setProjectId(projectId);
+                projectInfo.setProjectName(projectName);
+                projectInfo.setOwnerId(ownerId);
+                projectInfo.setDeadline(deadline);
                 projectList.add(projectInfo);
             }
             return projectList;

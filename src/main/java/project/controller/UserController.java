@@ -30,26 +30,21 @@ public class UserController {
         return "nybruger";
     }
 
-    @GetMapping("/projekter")
-    public String projects() {
-        return "projekter";
-    }
-
     @GetMapping("/fejlunderoprettelse")
     public String fejl() {
         return "fejlunderoprettelse";
     }
 
     @PostMapping("/signup")
-    public String signup(WebRequest request) {
+    public String signup(WebRequest request, Model model) {
         //Undersøger om parametre er null eller tomme
         Iterator<String> paramNames = request.getParameterNames();
         while (paramNames.hasNext()) {
             String paramName = paramNames.next();
             String paramValue = request.getParameter(paramName);
             if (paramValue == null || paramValue.isEmpty()) {
-                System.out.println("Parameter " + paramName + " is null or empty.");
-                return "redirect:/fejlunderoprettelse";
+                model.addAttribute("errorMessage", "Felterne må ikke være tomme");
+                return "fejlunderoprettelse";
             }
         }
         User newUser = new User();
@@ -60,10 +55,12 @@ public class UserController {
 
         //Undersøger om brugernavn eller kodeord er for kort.
         if (newUser.getUsername().length() < 3 || newUser.getPassword().length() < 3){
-            return "redirect:/fejlunderoprettelse";
+            model.addAttribute("errorMessage", "Brugernavn og kodeord skal være på minimum 3 tegn");
+            return "fejlunderoprettelse";
         } else {
             if (userRepo.checkIfDup(newUser)) {
-                return "redirect:/fejlunderoprettelse";
+                model.addAttribute("errorMessage", "Brugernavnet er taget");
+                return "fejlunderoprettelse";
             } else {
                 userRepo.addUser(newUser);
                 return "redirect:/";
@@ -73,21 +70,35 @@ public class UserController {
 
 
     //Login og vis brugerens projekter
-    @PostMapping("/projekter")
-    public String login(WebRequest request, HttpSession session, Model model) {
+    @PostMapping("/login")
+    public String login(WebRequest request, HttpSession session) {
         User userLogin = new User();
         userLogin.setUsername(request.getParameter("username"));
         userLogin.setPassword(request.getParameter("password"));
         if (userRepo.verifyLogin(userLogin)) {
-            List<Project> projectList = new ArrayList<>(userRepo.fetchProjects(userLogin));
-            model.addAttribute("projects", projectList);
-            session.setAttribute("username", userLogin.getUsername());
-            session.setAttribute("userId", userRepo.getUserId(userLogin));
-            return "projekter";
+            session.setAttribute("userlogin", userLogin);
+            return "redirect:/projekter";
         } else {
             return "login";
         }
     }
+
+    @GetMapping("/projekter")
+    public String projects(Model model, HttpSession session) {
+        User userLogin = (User) session.getAttribute("userlogin");
+        List<Project> projectList = new ArrayList<>(userRepo.getProjects(userLogin));
+        model.addAttribute("projects", projectList);
+        session.setAttribute("username", userLogin.getUsername());
+        session.setAttribute("userId", userRepo.getUserId(userLogin));
+        return "projekter";
+    }
+
+    @PostMapping("/logout")
+    public String logout(HttpSession session) {
+        session.invalidate();
+        return "redirect:/login";
+    }
+
 
 
 

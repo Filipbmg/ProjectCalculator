@@ -18,22 +18,27 @@
 <body>
 <div class="navbar">
     <div class="logo">
-        <a><h1>Ønskelisten</h1></a>
+        <a><h1>Projekt-Manager</h1></a>
     </div>
     <form action="/logout" method="POST">
         <button type="submit" class="logout-button">Log af</button>
     </form>
 </div>
 <div class="main">
-    <h1>Projekter</h1>
-    <ul>
-        <li th:each="project : ${projects}">
-            <a th:href="@{|/projektdetaljer/${project.projectId}|}">
-                <span th:text="${project.projectId} + ${project.projectName} +${project.ownerId}"></span>
-            </a>
-        </li>
-    </ul>
-    <p>Session Attribute: <span th:text="${session.userId}"></span></p>
+    <h2>Projekter</h2>
+    <div class="list">
+        <ul>
+            <li th:each="project : ${projects}">
+                <a th:href="@{|/projektdetaljer/${project.projectId}/${project.ownerId}|}">
+            <span>
+                <span th:text="${project.projectName}"></span>
+                <span>Deadline: <span th:text="${#temporals.format(project.deadline, 'dd-MM-yyyy')}"></span></span>
+            </span>
+                </a>
+            </li>
+        </ul>
+    </div>
+    <a href="/nytprojekt" class="btn btn-primary">Opret Nyt Projekt</a>
 </div>
 </body>
 </html>

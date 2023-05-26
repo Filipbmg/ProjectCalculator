@@ -3,19 +3,19 @@
     position: fixed;
     top: 0;
     width: 100%;
-    line-height: 5px;
+    line-height: 75px;
     left: 0;
     border-bottom: 1px solid lightseagreen;
     background-color: white;
     height: 75px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-left: 5px;
 }
 
-.logo {
-    padding-left: 10px;
-}
 h1 {
     font-size: 52px;
-    margin-bottom: 40px;
     color: lightseagreen;
 }
 .container {
@@ -27,7 +27,7 @@ h1 {
     border-radius: 8px;
     text-align: center;
 }
-.wishlist {
+.list {
     margin: auto;
     padding-left: 20px;
     padding-right: 20px;
@@ -68,6 +68,9 @@ button[type="submit"] {
     color: #fff;
     background-color: lightseagreen;
 }
+a {
+    text-decoration: none;
+}
 
 #del a {
 
@@ -102,21 +105,19 @@ button[type="submit"]:hover {
     margin-right: 10px !important;
     font-size: 18px !important;
     width: auto !important;
-    float: right; !important;
 }
 .logout-button:hover {
     background-color: darkred !important;
 }
 
-.wishlist li {
+.list li {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    padding-top: 5px;
+    padding-bottom: 10px;
 }
 
-.wishlist li a {
-    display: block;
-}
 
 
 button[type="button"] {
