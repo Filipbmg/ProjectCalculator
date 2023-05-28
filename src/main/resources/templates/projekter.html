@@ -30,10 +30,10 @@
         <ul>
             <li th:each="project : ${projects}">
                 <a th:href="@{|/projektdetaljer/${project.projectId}/${project.ownerId}|}">
-            <span>
+                <span>
                 <span th:text="${project.projectName}"></span>
                 <span>Deadline: <span th:text="${#temporals.format(project.deadline, 'dd-MM-yyyy')}"></span></span>
-            </span>
+                </span>
                 </a>
             </li>
         </ul>
