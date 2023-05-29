@@ -25,20 +25,55 @@
     </form>
 </div>
 <div class="main">
-    <h2>Projekter</h2>
-    <div class="list">
-        <ul>
-            <li th:each="project : ${projects}">
-                <a th:href="@{|/projektdetaljer/${project.projectId}/${project.ownerId}|}">
-                <span>
-                <span th:text="${project.projectName}"></span>
-                <span>Deadline: <span th:text="${#temporals.format(project.deadline, 'dd-MM-yyyy')}"></span></span>
-                </span>
-                </a>
-            </li>
-        </ul>
-    </div>
-    <a href="/nytprojekt" class="btn btn-primary">Opret Nyt Projekt</a>
+    <h2>Dine Projekter</h2>
+        <div class="list">
+            <table>
+                <thead>
+                <tr>
+                    <th>Navn</th>
+                    <th>Start</th>
+                    <th>Deadline</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="project : ${projects}" th:if="${project.ownerId == session.userId}">
+                    <td>
+                        <a th:href="@{/projektdetaljer/{projectId}/{ownerId}(projectId=${project.projectId}, ownerId=${project.ownerId})}">
+                            <span th:text="${project.projectName}"></span>
+                        </a>
+                    </td>
+                    <td th:text="${#temporals.format(project.start, 'dd-MM-yyyy')}"></td>
+                    <td th:text="${#temporals.format(project.deadline, 'dd-MM-yyyy')}"></td>
+                </tr>
+                </tbody>
+            </table>
+            <a href="/nytprojekt" class="btn btn-primary">Opret Nyt Projekt</a>
+        </div>
+
+
+        <h2>Projekter Du Deltager I</h2>
+        <div class="list">
+            <table>
+                <thead>
+                <tr>
+                    <th>Navn</th>
+                    <th>Start</th>
+                    <th>Deadline</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="project : ${projects}" th:if="${project.ownerId != session.userId}">
+                    <td>
+                        <a th:href="@{/projektdetaljer/{projectId}/{ownerId}(projectId=${project.projectId}, ownerId=${project.ownerId})}">
+                            <span th:text="${project.projectName}"></span>
+                        </a>
+                    </td>
+                    <td th:text="${#temporals.format(project.start, 'dd-MM-yyyy')}"></td>
+                    <td th:text="${#temporals.format(project.deadline, 'dd-MM-yyyy')}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
 </div>
 </body>
 </html>

@@ -23,7 +23,7 @@
 <div class="main">
   <h2 style="text-align: center;">Fejl under oprettelsen</h2>
   <div class="container">
-    <p th:text="${errorMessage}"></p>
+    <p th:text="${errormessage}"></p>
     <form action="/nybruger" method="GET">
       <a th:href="@{/nybruger}"><button type="button">Prøv Igen</button></a>
     </form>

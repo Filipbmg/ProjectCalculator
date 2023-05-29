@@ -1,28 +1,29 @@
 package project.controller;
 
 import jakarta.servlet.http.HttpSession;
-import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
 import project.model.*;
 import org.springframework.ui.Model;
 import project.repository.ProjectRepository;
-import project.repository.UserRepository;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
+
+import project.repository.UserRepository;
 import project.utility.CalculationTools;
 
 @Controller
 public class ProjectController {
     private final ProjectRepository projectRepo;
-    public ProjectController(ProjectRepository projectRepo){
+    private final UserRepository userRepo;
+    public ProjectController(ProjectRepository projectRepo, UserRepository userRepo){
         this.projectRepo = projectRepo;
+        this.userRepo = userRepo;
     }
 
     @GetMapping("/nytprojekt")
@@ -30,41 +31,42 @@ public class ProjectController {
         return "nytprojekt";
     }
 
-    @GetMapping("/ejer")
-    public String owner(HttpSession session, Model model) {
+
+    @GetMapping("/projektdetaljer/{projectId}/{ownerId}")
+    public String getProjectDetails(@PathVariable("projectId") int projectId, @PathVariable("ownerId") int ownerId, HttpSession session) {
+        session.setAttribute("projectId", projectId);
+        session.setAttribute("projectowner", ownerId);
+        return "redirect:/projekt";
+    }
+
+    @GetMapping("/projekt")
+    public String project(HttpSession session, Model model) {
         Project project = projectRepo.getProject((int) session.getAttribute("projectId"));
         List<Task> taskList = new ArrayList<>(projectRepo.getTasks((int) session.getAttribute("projectId")));
         List<SubProject> subprojectList = new ArrayList<>(projectRepo.getSubProjects((int) session.getAttribute("projectId")));
         model.addAttribute("project", project);
         model.addAttribute("tasks", taskList);
         model.addAttribute("subprojects", subprojectList);
-        model.addAttribute("hoursperday", CalculationTools.projectHoursPerDay(project.getTimeEstimate(), project.getDeadline()));
-        return "ejer";
+        model.addAttribute("hoursperday", CalculationTools.projectHoursPerDay(project.getTimeEstimate(), project.getStart(), project.getDeadline()));
+        return "projekt";
     }
 
-
-    @GetMapping("/projektdetaljer/{projectId}/{ownerId}")
-    public String projectDetails(@PathVariable("projectId") int projectId, @PathVariable("ownerId") int ownerId, HttpSession session) {
-        int userId = (int) session.getAttribute("userId");
-        session.setAttribute("projectId", projectId);
-        if (userId == ownerId) {
-            return "redirect:/ejer";
-        } else {
-            return "medlem";
-        }
-    }
-
-    @PostMapping("/newproject")
+    @PostMapping("/nytprojekt")
     public String createProject(@RequestParam("projectName") String projectName,
+                                @RequestParam("start") String start,
                                 @RequestParam("deadline") String deadline,
+                                @RequestParam("description") String description,
                                 HttpSession session) {
         DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         try {
-            LocalDate deadlineDate = LocalDate.parse(deadline, format);
             Project newproject = new Project();
-            newproject.setProjectName(projectName);
+            LocalDate startDate = LocalDate.parse(start, format);
+            LocalDate deadlineDate = LocalDate.parse(deadline, format);
             newproject.setOwnerId((int) session.getAttribute("userId"));
+            newproject.setProjectName(projectName);
+            newproject.setStart(startDate);
             newproject.setDeadline(deadlineDate);
+            newproject.setProjectDescription(description);
             projectRepo.dbAddProject(newproject);
         } catch (DateTimeParseException e){
             e.printStackTrace();
@@ -72,6 +74,30 @@ public class ProjectController {
         }
         return "redirect:/projekter";
     }
+
+    @GetMapping("/administrerprojekt")
+    public String adminProject(HttpSession session, Model model) {
+        List<User> userList = userRepo.getUserList((int) session.getAttribute("projectId"));
+        model.addAttribute("userlist", userList);
+        return "administrerprojekt";
+    }
+
+    //Fjerner bruger fra projekt brugerliste
+    @PostMapping("/fjernbruger/{userId}")
+    public String removeUserFromProject(@PathVariable("userId") int userId, HttpSession session){
+        projectRepo.removeUser(userId, (int) session.getAttribute("projectId"));
+        return "redirect:/administrerprojekt";
+    }
+
+    @PostMapping("/tilfojbruger")
+    public String addUserToUserList(WebRequest request, HttpSession session) {
+        if (request != null) {
+            int userId = userRepo.getUserId(request.getParameter("username"));
+            projectRepo.addUserToProject(userId, (int) session.getAttribute("projectId"));
+        }
+        return "redirect:/administrerprojekt";
+    }
+
     @PostMapping("/edittask")
     public String editTask(@RequestParam("taskId") int taskId, Model model) {
         model.addAttribute("task", projectRepo.getTask(taskId));
@@ -105,7 +131,7 @@ public class ProjectController {
         SubProject subproject = projectRepo.getSubProject((int) session.getAttribute("subprojectid"));
         model.addAttribute("subproject", subproject);
         model.addAttribute("subtasks", projectRepo.getSubTasks(subproject.getSubProjectId()));
-        model.addAttribute("hoursperday", CalculationTools.subprojectHoursPerDay(
+        model.addAttribute("hoursperday", CalculationTools.projectHoursPerDay(
                 subproject.getTimeEstimate(),
                 subproject.getStart(),
                 subproject.getDeadline()));

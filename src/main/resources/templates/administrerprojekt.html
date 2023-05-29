@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="da" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" th:href="@{css/style.css}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@400;700&display=swap" rel="stylesheet">
+    <title>Administrer Projekt</title>
+    <style>
+        body {
+            font-family: 'Source Sans Pro', sans-serif;
+            background-color: #f0f2f5;
+        }
+    </style>
+</head>
+<body>
+<div class="navbar">
+    <div class="logo">
+        <a><h1>Projekt-Manager</h1></a>
+    </div>
+    <form action="/logout" method="POST">
+        <button type="submit" class="logout-button">Log af</button>
+    </form>
+</div>
+<div class="main">
+    <h2>Medlemsliste</h2>
+    <div class="list">
+        <table>
+            <thead>
+            <tr>
+                <th>Fornavn</th>
+                <th>Efternavn</th>
+                <th>Fjern</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="user : ${userlist}" th:if="${user.userId != session.userId}">
+                <td th:text="${user.firstName}"></td>
+                <td th:text="${user.lastName}"></td>
+                <td>
+                    <form th:action="@{/fjernbruger/{userId}(userId=${user.userId})}" method="post">
+                        <input type="hidden" name="userId" th:value="${user.userId}" />
+                        <button type="submit" class="remove-button">X</button>
+                    </form>
+                </td>
+
+            </tr>
+            </tbody>
+        </table>
+        <form th:action="@{/tilfojbruger}" method="post">
+            <label for="username" style="font-weight: bold;">Tilføj Bruger:</label>
+            <input type="text" id="username" name="username" placeholder="Brugernavn"/>
+            <button type="submit" class="button">Tilføj Bruger</button>
+        </form>
+
+    </div>
+
+</div>
+</body>
+</html>

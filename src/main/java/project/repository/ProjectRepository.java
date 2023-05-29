@@ -2,10 +2,7 @@ package project.repository;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
-import project.model.Project;
-import project.model.SubProject;
-import project.model.SubTask;
-import project.model.Task;
+import project.model.*;
 import project.utility.ConnectionManager;
 
 import javax.xml.transform.Result;
@@ -30,21 +27,21 @@ public class ProjectRepository {
             Connection connection = ConnectionManager.getConnection(dbUrl, username, password);
 
             //Initialiser prepared statement
-            PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO projects (project_name, owner_id, deadline) VALUES (?, ?, ?)",
+            PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO projects (project_name, owner_id, start, deadline, project_description, time_estimate) VALUES (?, ?, ?, ?, ?, 0)",
                     Statement.RETURN_GENERATED_KEYS);
 
             //set attributer i prepared statement
             preparedStatement.setString(1, project.getProjectName());
             preparedStatement.setInt(2, project.getOwnerId());
-            preparedStatement.setDate(3, java.sql.Date.valueOf(project.getDeadline()));
+            preparedStatement.setDate(3, java.sql.Date.valueOf(project.getStart()));
+            preparedStatement.setDate(4, java.sql.Date.valueOf(project.getDeadline()));
+            preparedStatement.setString(5, project.getProjectDescription());
 
-            //execute
+            //execute og tag det genereret project_id
             int rowTest = preparedStatement.executeUpdate();
             if (rowTest == 0) {
                 throw new SQLException("Projektet blev ikke oprettet");
             }
-
-            //Undersøg om projektet blev oprettet og tag det genereret project_id
             ResultSet primaryKey = preparedStatement.getGeneratedKeys();
             int projectId;
             if (primaryKey.next()) {
@@ -54,12 +51,10 @@ public class ProjectRepository {
             }
 
             //Brug det generet project_id til at forbinde brugeren med hans nyoprettede projekt
-            preparedStatement = connection.prepareStatement("INSERT INTO project_users (project_id, user_id) VALUES (?, ?)");
-
-            preparedStatement.setInt(1, projectId);
-            preparedStatement.setInt(2, project.getOwnerId());
-
-            preparedStatement.executeUpdate();
+            PreparedStatement preparedStatement2 = connection.prepareStatement("INSERT INTO project_users (project_id, user_id) VALUES (?, ?)");
+            preparedStatement2.setInt(1, projectId);
+            preparedStatement2.setInt(2, project.getOwnerId());
+            preparedStatement2.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -113,6 +108,7 @@ public class ProjectRepository {
                 project.setOwnerId(results.getInt("owner_id"));
                 project.setProjectName(results.getString("project_name"));
                 project.setProjectDescription(results.getString("project_description"));
+                project.setStart(results.getDate("start").toLocalDate());
                 project.setDeadline(results.getDate("deadline").toLocalDate());
                 project.setTimeEstimate(results.getInt("time_estimate"));
             }
@@ -387,6 +383,54 @@ public class ProjectRepository {
         }
         return deadline;
     }
+
+    //Sletter brugers forbindelse til et projekt
+    public void removeUser(int userId, int projectId) {
+        try{
+            //connect to db
+            Connection connection = ConnectionManager.getConnection(dbUrl, username, password);
+
+            String query = "DELETE FROM project_users WHERE user_id = ? AND project_id =?";
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setInt(1, userId);
+            preparedStatement.setInt(2, projectId);
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    //Tilføjer bruger til projekts brugerliste
+    public void addUserToProject(int userId, int projectId) {
+        try{
+            //connect to db
+            Connection connection = ConnectionManager.getConnection(dbUrl, username, password);
+
+            //Undersøger om projectid + userid kombination allerede eksisterer
+            String query = "SELECT * FROM project_users WHERE user_id = ? AND project_id = ?";
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setInt(1, userId);
+            preparedStatement.setInt(2, projectId);
+            ResultSet result = preparedStatement.executeQuery();
+
+            //Stopper metoden hvis kombinationen allerede eksisterer
+            if (result.next()) {
+                return;
+            }
+
+            //Tilføj
+            query = "INSERT INTO project_users (user_id, project_id) VALUES (?, ?)";
+            PreparedStatement preparedStatement2 = connection.prepareStatement(query);
+            preparedStatement2.setInt(1, userId);
+            preparedStatement2.setInt(2, projectId);
+            preparedStatement2.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+
 
 }
 

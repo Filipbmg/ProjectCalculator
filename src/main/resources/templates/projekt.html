@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="da" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" th:href="@{css/style.css}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@400;700&display=swap" rel="stylesheet">
+    <title>Projekt</title>
+    <style>
+        body {
+            font-family: 'Source Sans Pro', sans-serif;
+            background-color: #f0f2f5;
+        }
+    </style>
+</head>
+<body>
+<div class="navbar">
+    <div class="logo">
+        <a><h1>Projekt-Manager</h1></a>
+    </div>
+    <div th:if="${session.userId == project.ownerId}">
+        <a href="/administrerprojekt" class="btn btn-primary">Administrer Projekt</a>
+    </div>
+    <form action="/logout" method="POST">
+        <button type="submit" class="logout-button">Log af</button>
+    </form>
+</div>
+<div class="main">
+    <span class="project-name" th:text="${project.projectName}">Project Name</span>
+    <span class="project-description" th:text="${project.projectDescription}">Project Description</span>
+    <span class="time-estimate" th:text="${project.timeEstimate}">Time Estimate</span>
+    <span class="hours-per-day" th:text="${hoursperday}">Hours Per Day</span>
+
+
+    <h2>Opgaver</h2>
+    <div class="list">
+        <table>
+            <thead>
+            <tr>
+                <th>Navn</th>
+                <th>Start</th>
+                <th>Deadline</th>
+                <th>Time Estimat</th>
+                <th>Beskrivelse</th>
+                <th>Action</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="task : ${tasks}">
+                <td th:text="${task.taskName}"></td>
+                <td th:text="${#temporals.format(task.start, 'dd-MM-yyyy')}"></td>
+                <td th:text="${#temporals.format(task.deadline, 'dd-MM-yyyy')}"></td>
+                <td th:text="${task.timeEstimate}"></td>
+                <td th:text="${task.taskDescription}"></td>
+                <td>
+                    <form action="/edittask" method="POST">
+                        <input type="hidden" name="taskId" th:value="${task.taskId}" />
+                        <button type="submit">Edit</button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+        </div>
+        <h2>Delprojekter</h2>
+    <div class="list">
+        <table>
+            <thead>
+            <tr>
+                <th>Navn</th>
+                <th>Start</th>
+                <th>Deadline</th>
+                <th>Time Estimat</th>
+                <th>Beskrivelse</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="subproject : ${subprojects}">
+                <td>
+                    <a th:href="@{/delprojekt/{subprojectId}(subprojectId=${subproject.subProjectId})}">
+                        <span th:text="${subproject.subProjectName}"></span>
+                    </a>
+                </td>
+                <td>
+                    <span th:text="${#temporals.format(subproject.start, 'dd-MM-yyyy')}"></span>
+                </td>
+                <td>
+                    <span th:text="${#temporals.format(subproject.deadline, 'dd-MM-yyyy')}"></span>
+                </td>
+                <td>
+                    <span th:text="${subproject.timeEstimate}"></span>
+                </td>
+                <td>
+                    <span th:text="${subproject.subProjectDescription}"></span>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+</div>
+</body>
+</html>
