@@ -1,0 +1,72 @@
+[33mcommit ea98ad612abea3e9cb15fdd7c0c0fb65753b9dbe[m[33m ([m[1;36mHEAD -> [m[1;32mmain[m[33m)[m
+Author: Filip Gynthersen <filipg@live.dk>
+Date:   Tue May 30 19:56:21 2023 +0200
+
+    DB
+
+[33mcommit 1a5df4f98376cec89787a129e2a793f5b48b5197[m[33m ([m[1;31morigin/main[m[33m)[m
+Author: Filip Gynthersen <filipg@live.dk>
+Date:   Tue May 30 19:40:06 2023 +0200
+
+    Repository strukturering
+
+[33mcommit bca4caebb18163421ed7c8c8d004576893b565ab[m
+Author: Filip Gynthersen <filipg@live.dk>
+Date:   Tue May 30 18:07:19 2023 +0200
+
+    Tilføj menuer og models
+
+[33mcommit b9fb6946e42f47068197a8830808b478206eabfd[m
+Author: Filip Gynthersen <filipg@live.dk>
+Date:   Tue May 30 06:46:00 2023 +0200
+
+    HTML og tests
+
+[33mcommit 3ac7846d3543aea6993618f9c42e817a824f0ad3[m
+Author: Filip Gynthersen <filipg@live.dk>
+Date:   Mon May 29 19:01:50 2023 +0200
+
+    HTML og tests
+
+[33mcommit eaf11044ae314e3a3d76415e6b2feaae98b55606[m
+Author: Filip Gynthersen <filipg@live.dk>
+Date:   Sun May 28 06:14:42 2023 +0200
+
+    Tilføj regneredskaber og projectController+Repo
+
+[33mcommit 17c92d9275bc91f7122531ac1cf48a2af43eb8c6[m
+Author: Filip Gynthersen <filipg@live.dk>
+Date:   Fri May 26 23:19:19 2023 +0200
+
+    Færdiggør login, tilføj projekt
+
+[33mcommit 4af5f301f81c40cafb7a3f72b18d9cf797182455[m
+Author: Filip Gynthersen <filipg@live.dk>
+Date:   Tue May 23 22:31:20 2023 +0200
+
+    Tilføj User og Project elementer
+
+[33mcommit 962e0762ec0d6c6356b2d1a34b3bb7caec8343e8[m
+Merge: 4dbf56b 2990c6f
+Author: Filip Gynthersen <filipg@live.dk>
+Date:   Mon May 22 01:42:02 2023 +0200
+
+    Merge branch 'main' of https://github.com/Filipbmg/ProjectCalculator
+
+[33mcommit 4dbf56bdf59e62bc644054a70fe01108b60824c1[m
+Author: Filip Gynthersen <filipg@live.dk>
+Date:   Mon May 22 01:25:20 2023 +0200
+
+    Genbrug og tilret genbrugt kode
+
+[33mcommit 2990c6fbbdf6c94013b81445d29b7d344e0a307a[m
+Author: Filip Gynthersen <filipg@live.dk>
+Date:   Mon May 22 01:25:20 2023 +0200
+
+    First commit. UI, DB singleton, basic HTML.
+
+[33mcommit 9ea8201d5aabe729ad79a8d1ef304062d33e5945[m
+Author: Filip Gynthersen <filipg@live.dk>
+Date:   Sat May 20 22:39:17 2023 +0200
+
+    First commit, DB manager, basic html
