@@ -20,9 +20,13 @@
     <div class="logo">
         <a><h1>Projekt-Manager</h1></a>
     </div>
+
+    <a th:href="@{projekter}"><button type="button">Projektliste</button></a>
+
     <div th:if="${session.userId == project.ownerId}">
         <a href="/administrerprojekt" class="btn btn-primary">Administrer Projekt</a>
     </div>
+
     <form action="/logout" method="POST">
         <button type="submit" class="logout-button">Log af</button>
     </form>
