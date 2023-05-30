@@ -82,38 +82,6 @@ public class UserRepository {
         return false;
     }
 
-    public List<Project> getProjects(String loggedinUsername){
-        List<Project> projectList = new ArrayList<>();
-        try{
-            //connect to db
-            Connection connection = ConnectionManager.getConnection(dbUrl, username, password);
-
-            //Brug brugernavn til at få projekter brugeren er en del af
-            String query = "SELECT projects.id, projects.project_name, projects.owner_id, projects.start, projects.deadline, project_description FROM projects " +
-                    "JOIN project_users ON projects.id = project_users.project_id " +
-                    "JOIN users ON project_users.user_id = users.id " +
-                    "WHERE users.username = ? " +
-                    "ORDER BY projects.deadline";
-            PreparedStatement preparedStatement = connection.prepareStatement(query);
-            preparedStatement.setString(1, loggedinUsername);
-            ResultSet projectResults = preparedStatement.executeQuery();
-            while (projectResults.next()) {
-                Project projectInfo = new Project();
-                projectInfo.setProjectId(projectResults.getInt("id"));
-                projectInfo.setProjectName(projectResults.getString("project_name"));
-                projectInfo.setProjectDescription(projectResults.getString("project_description"));
-                projectInfo.setOwnerId(projectResults.getInt("owner_id"));
-                projectInfo.setStart(projectResults.getDate("start").toLocalDate());
-                projectInfo.setDeadline(projectResults.getDate("deadline").toLocalDate());
-                projectList.add(projectInfo);
-            }
-            return projectList;
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return projectList;
-    }
-
     public int getUserId(String loggedinUsername) {
         int userId = 0;
         try {

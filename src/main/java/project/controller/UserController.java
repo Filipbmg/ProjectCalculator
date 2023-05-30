@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.WebRequest;
 import project.model.*;
 import org.springframework.ui.Model;
+import project.repository.ProjectRepository;
 import project.repository.UserRepository;
 
 import java.util.ArrayList;
@@ -16,8 +17,10 @@ import java.util.List;
 public class UserController {
 
     private final UserRepository userRepo;
-    public UserController(UserRepository userRepo){
+    private final ProjectRepository projectRepo;
+    public UserController(UserRepository userRepo, ProjectRepository projectRepo){
         this.userRepo = userRepo;
+        this.projectRepo = projectRepo;
     }
 
     @GetMapping({"/", "login"})
@@ -83,7 +86,7 @@ public class UserController {
 
     @GetMapping("/projekter")
     public String projects(Model model, HttpSession session) {
-        List<Project> projectList = new ArrayList<>(userRepo.getProjects((String) session.getAttribute("username")));
+        List<Project> projectList = new ArrayList<>(projectRepo.getProjects((String) session.getAttribute("username")));
         model.addAttribute("projects", projectList);
         session.setAttribute("userId", userRepo.getUserId((String) session.getAttribute("username")));
         return "projekter";

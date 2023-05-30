@@ -5,7 +5,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import project.model.*;
 import org.springframework.ui.Model;
-import project.repository.ProjectRepository;
+import project.repository.*;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -13,16 +13,25 @@ import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 
-import project.repository.UserRepository;
 import project.utility.CalculationTools;
 
 @Controller
 public class ProjectController {
     private final ProjectRepository projectRepo;
     private final UserRepository userRepo;
-    public ProjectController(ProjectRepository projectRepo, UserRepository userRepo){
+    private final SubProjectRepository subProjectRepo;
+    private final TaskRepository taskRepo;
+    private final SubTaskRepository subTaskRepo;
+    public ProjectController(ProjectRepository projectRepo,
+                             UserRepository userRepo,
+                             SubProjectRepository subProjectRepo,
+                             TaskRepository taskRepo,
+                             SubTaskRepository subTaskRepo){
         this.projectRepo = projectRepo;
+        this.subProjectRepo = subProjectRepo;
+        this.taskRepo = taskRepo;
         this.userRepo = userRepo;
+        this.subTaskRepo = subTaskRepo;
     }
 
     @GetMapping("/nytprojekt")
@@ -57,8 +66,8 @@ public class ProjectController {
     @GetMapping("/projekt")
     public String project(HttpSession session, Model model) {
         Project project = projectRepo.getProject((int) session.getAttribute("projectId"));
-        List<Task> taskList = new ArrayList<>(projectRepo.getTasks((int) session.getAttribute("projectId")));
-        List<SubProject> subprojectList = new ArrayList<>(projectRepo.getSubProjects((int) session.getAttribute("projectId")));
+        List<Task> taskList = new ArrayList<>(taskRepo.getTasks((int) session.getAttribute("projectId")));
+        List<SubProject> subprojectList = new ArrayList<>(subProjectRepo.getSubProjects((int) session.getAttribute("projectId")));
         model.addAttribute("project", project);
         model.addAttribute("tasks", taskList);
         model.addAttribute("subprojects", subprojectList);
@@ -118,23 +127,23 @@ public class ProjectController {
 
     @PostMapping("/redigeropgave")
     public String editTask(@RequestParam("taskId") int taskId, Model model) {
-        model.addAttribute("task", projectRepo.getTask(taskId));
+        model.addAttribute("task", taskRepo.getTask(taskId));
         return "redigeropgave";
     }
 
 
     @PostMapping("/opdateropgave")
     public String updateTask(@RequestParam("taskId") int taskId, @ModelAttribute("task") Task updatedTask) {
-        Task existingTask = projectRepo.getTask(taskId);
+        Task existingTask = taskRepo.getTask(taskId);
         existingTask.setTimeEstimate(updatedTask.getTimeEstimate());
         existingTask.setTaskDescription(updatedTask.getTaskDescription());
-        projectRepo.updateTask(existingTask);
+        taskRepo.updateTask(existingTask);
         return "redirect:/projekt";
     }
 
     @PostMapping("/sletopgave")
     public String deleteTask(@RequestParam("taskId") int taskId) {
-        projectRepo.deleteTask(taskId);
+        taskRepo.deleteTask(taskId);
         return "redirect:/projekt";
     }
 
@@ -146,9 +155,9 @@ public class ProjectController {
 
     @GetMapping("/delprojekt")
     public String delprojekt(HttpSession session, Model model) {
-        SubProject subproject = projectRepo.getSubProject((int) session.getAttribute("subprojectid"));
+        SubProject subproject = subProjectRepo.getSubProject((int) session.getAttribute("subprojectid"));
         model.addAttribute("subproject", subproject);
-        model.addAttribute("subtasks", projectRepo.getSubTasks(subproject.getSubProjectId()));
+        model.addAttribute("subtasks", subTaskRepo.getSubTasks(subproject.getSubProjectId()));
         model.addAttribute("hoursperday", CalculationTools.projectHoursPerDay(
                 subproject.getTimeEstimate(),
                 subproject.getStart(),
@@ -156,25 +165,25 @@ public class ProjectController {
         return "delprojekt";
     }
 
-    @PostMapping("/editsubtask")
+    @PostMapping("/redigerdelopgave")
     public String editSubTask(@RequestParam("subTaskId") int subTaskId, Model model) {
-            model.addAttribute("subtask", projectRepo.getSubTask(subTaskId));
+            model.addAttribute("subtask", subTaskRepo.getSubTask(subTaskId));
             return "redigerdelopgave";
     }
 
-    @PostMapping("/updatesubtask/{subTaskId}")
-    public String updateSubTask(@PathVariable("subTaskId") int subTaskId, @ModelAttribute("task") SubTask updatedTask) {
-        SubTask existingSubTask = projectRepo.getSubTask(subTaskId);
+    @PostMapping("/opdaterdelopgave")
+    public String updateSubTask(@RequestParam("subTaskId") int subTaskId, @ModelAttribute("task") SubTask updatedTask) {
+        SubTask existingSubTask = subTaskRepo.getSubTask(subTaskId);
         existingSubTask.setTimeEstimate(updatedTask.getTimeEstimate());
         existingSubTask.setSubTaskDescription(updatedTask.getSubTaskDescription());
-        projectRepo.updateSubTask(existingSubTask);
-        return "redirect:/ejer";
+        subTaskRepo.updateSubTask(existingSubTask);
+        return "redirect:/delprojekt";
     }
 
-    @PostMapping("/deletesubtask/{subTaskId}")
-    public String deleteSubTask(@PathVariable("subTaskId") int subTaskId) {
-        projectRepo.deleteSubTask(subTaskId);
-        return "redirect:/ejer";
+    @PostMapping("/sletdelopgave")
+    public String deleteSubTask(@RequestParam("subTaskId") int subTaskId) {
+        subTaskRepo.deleteSubTask(subTaskId);
+        return "redirect:/delprojekt";
     }
 
     @PostMapping("/nyopgave")
@@ -195,7 +204,7 @@ public class ProjectController {
             newTask.setStart(startDate);
             newTask.setDeadline(deadlineDate);
             newTask.setTimeEstimate(timeEstimate);
-            projectRepo.createTask(newTask);
+            taskRepo.createTask(newTask);
         } catch (DateTimeParseException e){
             e.printStackTrace();
             return "redirect:/nyopgave";
@@ -250,7 +259,7 @@ public class ProjectController {
             newSubTask.setStart(startDate);
             newSubTask.setDeadline(deadlineDate);
             newSubTask.setTimeEstimate(timeEstimate);
-            projectRepo.createSubTask(newSubTask);
+            subTaskRepo.createSubTask(newSubTask);
         } catch (DateTimeParseException e){
             e.printStackTrace();
             return "redirect:/nydelopgave";
@@ -276,7 +285,7 @@ public class ProjectController {
             newSubProject.setStart(startDate);
             newSubProject.setDeadline(deadlineDate);
             newSubProject.setSubProjectDescription(description);
-            projectRepo.dbAddSubProject(newSubProject);
+            subProjectRepo.dbAddSubProject(newSubProject);
         } catch (DateTimeParseException e){
             e.printStackTrace();
             return "redirect:/nytdelprojekt";
@@ -309,13 +318,13 @@ public class ProjectController {
 
     @PostMapping("/sletdelprojekt")
     public String deleteSubProject(@RequestParam("subProjectId") int subProjectId) {
-        projectRepo.deleteSubProject(subProjectId);
+        subProjectRepo.deleteSubProject(subProjectId);
         return "redirect:/projekt";
     }
 
     @PostMapping("/redigerdelprojekt")
     public String editSubProject(@RequestParam("subProjectId") int subProjectId, Model model) {
-        model.addAttribute("subproject", projectRepo.getSubProject(subProjectId));
+        model.addAttribute("subproject", subProjectRepo.getSubProject(subProjectId));
         return "redigerdelprojekt";
     }
 
@@ -333,7 +342,7 @@ public class ProjectController {
             subProject.setStart(startDate);
             subProject.setDeadline(deadlineDate);
             subProject.setSubProjectDescription(description);
-            projectRepo.updateSubProject(subProject);
+            subProjectRepo.subprojectUpdate(subProject);
         } catch (DateTimeParseException e){
             e.printStackTrace();
             return "redirect:/redigerdelprojekt";

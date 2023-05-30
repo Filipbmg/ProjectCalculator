@@ -50,7 +50,6 @@
                 <th>Deadline</th>
                 <th>Time Estimat</th>
                 <th>Beskrivelse</th>
-                <th>Action</th>
             </tr>
             </thead>
             <tbody>
@@ -61,9 +60,15 @@
                 <td th:text="${subtask.timeEstimate}"></td>
                 <td th:text="${subtask.subTaskDescription}"></td>
                 <td>
-                    <form action="/editsubtask" method="POST">
+                    <form action="/redigerdelopgave" method="POST">
                         <input type="hidden" name="subTaskId" th:value="${subtask.subTaskId}" />
-                        <button type="submit">Edit</button>
+                        <button type="submit">Rediger</button>
+                    </form>
+                </td>
+                <td>
+                    <form action="/sletdelopgave" method="POST">
+                        <input type="hidden" name="subTaskId" th:value="${task.taskId}" />
+                        <button type="submit" class="logout-button">Slet</button>
                     </form>
                 </td>
             </tr>
