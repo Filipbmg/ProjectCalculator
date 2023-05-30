@@ -20,6 +20,11 @@
     <div class="logo">
         <a><h1>Projekt-Manager</h1></a>
     </div>
+
+    <div class="menu">
+        <a th:href="@{nytprojekt}">Opret Nyt Projekt</a>
+    </div>
+
     <form action="/logout" method="POST">
         <button type="submit" class="logout-button">Log af</button>
     </form>
@@ -33,6 +38,7 @@
                     <th>Navn</th>
                     <th>Start</th>
                     <th>Deadline</th>
+                    <th>Beskrivelse</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -44,10 +50,23 @@
                     </td>
                     <td th:text="${#temporals.format(project.start, 'dd-MM-yyyy')}"></td>
                     <td th:text="${#temporals.format(project.deadline, 'dd-MM-yyyy')}"></td>
+                    <td th:text="${project.projectDescription}"></td>
+                    <td>
+                        <form action="/redigerprojekt" method="POST">
+                            <input type="hidden" name="projectId" th:value="${project.projectId}" />
+                            <button type="submit">Rediger</button>
+                        </form>
+                    </td>
+                    <td>
+                        <form action="/bekræft" method="POST">
+                            <input type="hidden" name="projectId" th:value="${project.projectId}" />
+                            <button type="submit" class="logout-button">Slet</button>
+                        </form>
+                    </td>
+
                 </tr>
                 </tbody>
             </table>
-            <a th:href="@{nytprojekt}"><button type="button">Opret Nyt Projekt</button></a>
         </div>
 
 
@@ -59,6 +78,7 @@
                     <th>Navn</th>
                     <th>Start</th>
                     <th>Deadline</th>
+                    <th>Beskrivelse</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -70,6 +90,13 @@
                     </td>
                     <td th:text="${#temporals.format(project.start, 'dd-MM-yyyy')}"></td>
                     <td th:text="${#temporals.format(project.deadline, 'dd-MM-yyyy')}"></td>
+                    <td th:text="${project.projectDescription}"></td>
+                    <td>
+                        <form action="/forladprojekt" method="POST">
+                            <input type="hidden" name="projectId" th:value="${project.projectId}" />
+                            <button type="submit" class="logout-button">Forlad</button>
+                        </form>
+                    </td>
                 </tr>
                 </tbody>
             </table>

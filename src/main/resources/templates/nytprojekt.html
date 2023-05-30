@@ -21,7 +21,9 @@
     <a><h1>Projekt-Manager</h1></a>
   </div>
 
-  <a th:href="@{projekter}"><button type="button">Projektliste</button></a>
+  <div class="menu">
+    <a th:href="@{projekter}">Projektliste</a>
+  </div>
 
   <form action="/logout" method="POST">
     <button type="submit" class="logout-button">Log af</button>
@@ -31,7 +33,7 @@
     <div class="container">
       <form action="/nytprojekt" method="POST">
         <div>
-          <label for="projectName">Projekt navn</label>
+          <label for="projectName">Projekt Navn</label>
           <input type="text" id="projectName" name="projectName" required placeholder="Projekt navn">
         </div>
         <div>

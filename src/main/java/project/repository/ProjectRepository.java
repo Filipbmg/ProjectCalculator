@@ -22,7 +22,7 @@ public class ProjectRepository {
     private String password;
 
     public void dbAddProject(Project project) {
-        try{
+        try {
             //Connect til db
             Connection connection = ConnectionManager.getConnection(dbUrl, username, password);
 
@@ -59,9 +59,10 @@ public class ProjectRepository {
             e.printStackTrace();
         }
     }
+
     public List<Task> getTasks(int projectId) {
         List<Task> taskList = new ArrayList<>();
-        try{
+        try {
             //connect to db
             Connection connection = ConnectionManager.getConnection(dbUrl, username, password);
 
@@ -93,7 +94,7 @@ public class ProjectRepository {
 
     public Project getProject(int projectId) {
         Project project = new Project();
-        try{
+        try {
             //connect to db
             Connection connection = ConnectionManager.getConnection(dbUrl, username, password);
 
@@ -121,7 +122,7 @@ public class ProjectRepository {
 
     public List<SubProject> getSubProjects(int projectId) {
         List<SubProject> subProjectList = new ArrayList<>();
-        try{
+        try {
             //connect to db
             Connection connection = ConnectionManager.getConnection(dbUrl, username, password);
 
@@ -152,7 +153,7 @@ public class ProjectRepository {
     }
 
     public void updateTask(Task task) {
-        try{
+        try {
             //connect to db
             Connection connection = ConnectionManager.getConnection(dbUrl, username, password);
 
@@ -192,35 +193,36 @@ public class ProjectRepository {
         }
     }
 
-        public Task getTask(int taskId) {
-            Task task = new Task();
-            try{
-                //connect to db
-                Connection connection = ConnectionManager.getConnection(dbUrl, username, password);
+    public Task getTask(int taskId) {
+        Task task = new Task();
+        try {
+            //connect to db
+            Connection connection = ConnectionManager.getConnection(dbUrl, username, password);
 
-                //Brug brugernavn til at få projekt id, navn og projekt ejer id på alle projekter brugeren er en del af
-                String query = "SELECT tasks.* FROM tasks WHERE id = ?";
-                PreparedStatement preparedStatement = connection.prepareStatement(query);
-                preparedStatement.setInt(1, taskId);
+            //Brug brugernavn til at få projekt id, navn og projekt ejer id på alle projekter brugeren er en del af
+            String query = "SELECT tasks.* FROM tasks WHERE id = ?";
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setInt(1, taskId);
 
-                ResultSet results = preparedStatement.executeQuery();
-                if (results.next()) {
-                    task.setTaskId(results.getInt("id"));
-                    task.setProjectId(results.getInt("project_id"));
-                    task.setTaskName(results.getString("task_name"));
-                    task.setTaskDescription(results.getString("task_description"));
-                    task.setStart(results.getDate("start").toLocalDate());
-                    task.setDeadline(results.getDate("deadline").toLocalDate());
-                    task.setTimeEstimate(results.getInt("time_estimate"));
-                }
-                return task;
-            } catch (SQLException e) {
-                e.printStackTrace();
+            ResultSet results = preparedStatement.executeQuery();
+            if (results.next()) {
+                task.setTaskId(results.getInt("id"));
+                task.setProjectId(results.getInt("project_id"));
+                task.setTaskName(results.getString("task_name"));
+                task.setTaskDescription(results.getString("task_description"));
+                task.setStart(results.getDate("start").toLocalDate());
+                task.setDeadline(results.getDate("deadline").toLocalDate());
+                task.setTimeEstimate(results.getInt("time_estimate"));
             }
             return task;
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
+        return task;
+    }
+
     public void deleteTask(int taskId) {
-        try{
+        try {
             //connect to db
             Connection connection = ConnectionManager.getConnection(dbUrl, username, password);
 
@@ -237,7 +239,7 @@ public class ProjectRepository {
 
     public List<SubTask> getSubTasks(int subProjectId) {
         List<SubTask> subTaskList = new ArrayList<>();
-        try{
+        try {
             //connect to db
             Connection connection = ConnectionManager.getConnection(dbUrl, username, password);
 
@@ -269,7 +271,7 @@ public class ProjectRepository {
 
     public SubProject getSubProject(int subProjectId) {
         SubProject subproject = new SubProject();
-        try{
+        try {
             //connect to db
             Connection connection = ConnectionManager.getConnection(dbUrl, username, password);
 
@@ -297,7 +299,7 @@ public class ProjectRepository {
 
     public SubTask getSubTask(int subTaskId) {
         SubTask subTask = new SubTask();
-        try{
+        try {
             //connect to db
             Connection connection = ConnectionManager.getConnection(dbUrl, username, password);
 
@@ -324,7 +326,7 @@ public class ProjectRepository {
     }
 
     public void updateSubTask(SubTask subTask) {
-        try{
+        try {
             //connect to db
             Connection connection = ConnectionManager.getConnection(dbUrl, username, password);
 
@@ -347,7 +349,7 @@ public class ProjectRepository {
     }
 
     public void deleteSubTask(int subTaskId) {
-        try{
+        try {
             //connect to db
             Connection connection = ConnectionManager.getConnection(dbUrl, username, password);
 
@@ -363,8 +365,8 @@ public class ProjectRepository {
     }
 
     public LocalDate getProjectDeadline(int projectId) {
-            LocalDate deadline = null;
-        try{
+        LocalDate deadline = null;
+        try {
             //connect to db
             Connection connection = ConnectionManager.getConnection(dbUrl, username, password);
 
@@ -386,7 +388,7 @@ public class ProjectRepository {
 
     //Sletter brugers forbindelse til et projekt
     public void removeUser(int userId, int projectId) {
-        try{
+        try {
             //connect to db
             Connection connection = ConnectionManager.getConnection(dbUrl, username, password);
 
@@ -402,7 +404,7 @@ public class ProjectRepository {
 
     //Tilføjer bruger til projekts brugerliste
     public void addUserToProject(int userId, int projectId) {
-        try{
+        try {
             //connect to db
             Connection connection = ConnectionManager.getConnection(dbUrl, username, password);
 
@@ -429,9 +431,138 @@ public class ProjectRepository {
         }
     }
 
+    public void createTask(Task task) {
+        try {
+            //connect to db
+            Connection connection = ConnectionManager.getConnection(dbUrl, username, password);
+
+            //Set attributer
+            String query = "INSERT INTO tasks (project_id, task_name, task_description, start, deadline, time_estimate) VALUES (?, ?, ?, ?, ?, ?)";
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setInt(1, task.getProjectId());
+            preparedStatement.setString(2, task.getTaskName());
+            preparedStatement.setString(3, task.getTaskDescription());
+            preparedStatement.setDate(4, java.sql.Date.valueOf(task.getStart()));
+            preparedStatement.setDate(5, java.sql.Date.valueOf(task.getDeadline()));
+            preparedStatement.setInt(6, task.getTimeEstimate());
+
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void deleteProject(int projectId) {
+        try {
+            //connect to db
+            Connection connection = ConnectionManager.getConnection(dbUrl, username, password);
+
+            String query = "DELETE FROM projects WHERE id = ?";
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setInt(1, projectId);
+            preparedStatement.executeUpdate();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void updateProject(Project project) {
+        try {
+            //connect to db
+            Connection connection = ConnectionManager.getConnection(dbUrl, username, password);
+
+            String query = "UPDATE projects SET project_description = ?, start = ?, deadline = ? WHERE id = ?";
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setString(1, project.getProjectDescription());
+            preparedStatement.setDate(2, java.sql.Date.valueOf(project.getStart()));
+            preparedStatement.setDate(3, java.sql.Date.valueOf(project.getDeadline()));
+            preparedStatement.setInt(4, project.getProjectId());
+            preparedStatement.executeUpdate();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 
 
+    public void createSubTask(SubTask subTask) {
+        try {
+            //connect to db
+            Connection connection = ConnectionManager.getConnection(dbUrl, username, password);
 
+            //Set attributer
+            String query = "INSERT INTO subtasks (subproject_id, subtask_name, subtask_description, start, deadline, time_estimate) VALUES (?, ?, ?, ?, ?, ?)";
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setInt(1, subTask.getSubProjectId());
+            preparedStatement.setString(2, subTask.getSubTaskName());
+            preparedStatement.setString(3, subTask.getSubTaskDescription());
+            preparedStatement.setDate(4, java.sql.Date.valueOf(subTask.getStart()));
+            preparedStatement.setDate(5, java.sql.Date.valueOf(subTask.getDeadline()));
+            preparedStatement.setInt(6, subTask.getTimeEstimate());
+
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void dbAddSubProject(SubProject subProject) {
+        try {
+            //Connect til db
+            Connection connection = ConnectionManager.getConnection(dbUrl, username, password);
+
+            //Initialiser prepared statement
+            PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO subprojects (subproject_name, project_id, start, deadline, subproject_description, time_estimate) VALUES (?, ?, ?, ?, ?, 0)",
+                    Statement.RETURN_GENERATED_KEYS);
+
+            //set attributer i prepared statement
+            preparedStatement.setString(1, subProject.getSubProjectName());
+            preparedStatement.setInt(2, subProject.getProjectId());
+            preparedStatement.setDate(3, java.sql.Date.valueOf(subProject.getStart()));
+            preparedStatement.setDate(4, java.sql.Date.valueOf(subProject.getDeadline()));
+            preparedStatement.setString(5, subProject.getSubProjectDescription());
+
+            //execute og tag det genereret project_id
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void deleteSubProject(int subProjectId) {
+        try {
+            //connect to db
+            Connection connection = ConnectionManager.getConnection(dbUrl, username, password);
+
+            String query = "DELETE FROM subprojects WHERE id = ?";
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setInt(1, subProjectId);
+            preparedStatement.executeUpdate();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    public void updateSubProject(SubProject subProject) {
+        try {
+            //connect to db
+            Connection connection = ConnectionManager.getConnection(dbUrl, username, password);
+
+            String query = "UPDATE subprojects SET subproject_description = ?, start = ?, deadline = ? WHERE id = ?";
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setString(1, subProject.getSubProjectDescription());
+            preparedStatement.setDate(2, java.sql.Date.valueOf(subProject.getStart()));
+            preparedStatement.setDate(3, java.sql.Date.valueOf(subProject.getDeadline()));
+            preparedStatement.setInt(4, subProject.getSubProjectId());
+            preparedStatement.executeUpdate();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 }
 
 

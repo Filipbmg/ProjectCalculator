@@ -8,7 +8,6 @@ import project.model.Project;
 import project.utility.ConnectionManager;
 
 import java.sql.*;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,7 +22,7 @@ public class UserRepository {
     @Value("${spring.datasource.password}")
     private String password;
 
-    public boolean checkIfDup(String newUsername) {
+    public boolean checkIfUserExists(String newUsername) {
         try {
             //connect to db
             Connection connection = ConnectionManager.getConnection(dbUrl, username, password);
@@ -90,7 +89,7 @@ public class UserRepository {
             Connection connection = ConnectionManager.getConnection(dbUrl, username, password);
 
             //Brug brugernavn til at få projekter brugeren er en del af
-            String query = "SELECT projects.id, projects.project_name, projects.owner_id, projects.start, projects.deadline FROM projects " +
+            String query = "SELECT projects.id, projects.project_name, projects.owner_id, projects.start, projects.deadline, project_description FROM projects " +
                     "JOIN project_users ON projects.id = project_users.project_id " +
                     "JOIN users ON project_users.user_id = users.id " +
                     "WHERE users.username = ? " +
@@ -102,6 +101,7 @@ public class UserRepository {
                 Project projectInfo = new Project();
                 projectInfo.setProjectId(projectResults.getInt("id"));
                 projectInfo.setProjectName(projectResults.getString("project_name"));
+                projectInfo.setProjectDescription(projectResults.getString("project_description"));
                 projectInfo.setOwnerId(projectResults.getInt("owner_id"));
                 projectInfo.setStart(projectResults.getDate("start").toLocalDate());
                 projectInfo.setDeadline(projectResults.getDate("deadline").toLocalDate());

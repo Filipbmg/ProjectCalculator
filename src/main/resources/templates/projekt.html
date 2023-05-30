@@ -21,10 +21,12 @@
         <a><h1>Projekt-Manager</h1></a>
     </div>
 
-    <a th:href="@{projekter}"><button type="button">Projektliste</button></a>
 
-    <div th:if="${session.userId == project.ownerId}">
-        <a href="/administrerprojekt" class="btn btn-primary">Administrer Projekt</a>
+    <div class="menu">
+        <a th:href="@{projekter}">Projektliste</a>
+        <a th:href="@{nyopgave}">Opret Opgave</a>
+        <a th:href="@{nytdelprojekt}">Opret Delprojekt</a>
+        <a th:if="${session.userId == project.ownerId}" th:href="@{projektmedlemmer}">Projektmedlemmer</a>
     </div>
 
     <form action="/logout" method="POST">
@@ -46,9 +48,8 @@
                 <th>Navn</th>
                 <th>Start</th>
                 <th>Deadline</th>
-                <th>Time Estimat</th>
+                <th>Estimeret Timer</th>
                 <th>Beskrivelse</th>
-                <th>Action</th>
             </tr>
             </thead>
             <tbody>
@@ -59,11 +60,18 @@
                 <td th:text="${task.timeEstimate}"></td>
                 <td th:text="${task.taskDescription}"></td>
                 <td>
-                    <form action="/edittask" method="POST">
+                    <form action="/redigeropgave" method="POST">
                         <input type="hidden" name="taskId" th:value="${task.taskId}" />
-                        <button type="submit">Edit</button>
+                        <button type="submit">Rediger</button>
                     </form>
                 </td>
+                <td>
+                    <form action="/sletopgave" method="POST">
+                        <input type="hidden" name="taskId" th:value="${task.taskId}" />
+                        <button type="submit" class="logout-button">Slet</button>
+                    </form>
+                </td>
+
             </tr>
             </tbody>
         </table>
@@ -76,7 +84,7 @@
                 <th>Navn</th>
                 <th>Start</th>
                 <th>Deadline</th>
-                <th>Time Estimat</th>
+                <th>Estimeret Timer</th>
                 <th>Beskrivelse</th>
             </tr>
             </thead>
@@ -98,6 +106,18 @@
                 </td>
                 <td>
                     <span th:text="${subproject.subProjectDescription}"></span>
+                </td>
+                <td>
+                    <form action="/redigerdelprojekt" method="POST">
+                        <input type="hidden" name="subProjectId" th:value="${subproject.subProjectId}" />
+                        <button type="submit" class="button">Rediger</button>
+                    </form>
+                </td>
+                <td>
+                    <form action="/sletdelprojekt" method="POST">
+                        <input type="hidden" name="subProjectId" th:value="${subproject.subProjectId}" />
+                        <button type="submit" class="logout-button">Slet</button>
+                    </form>
                 </td>
             </tr>
             </tbody>

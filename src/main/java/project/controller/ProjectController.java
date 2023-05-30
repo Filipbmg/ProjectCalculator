@@ -3,7 +3,6 @@ package project.controller;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.context.request.WebRequest;
 import project.model.*;
 import org.springframework.ui.Model;
 import project.repository.ProjectRepository;
@@ -27,9 +26,25 @@ public class ProjectController {
     }
 
     @GetMapping("/nytprojekt")
-    public String createNew(){
+    public String createNewProject(){
         return "nytprojekt";
     }
+
+    @GetMapping("/nyopgave")
+    public String createNewTask() {
+        return "nyopgave";
+    }
+
+    @GetMapping("/nydelopgave")
+    public String createNewSubTask() {
+        return "nydelopgave";
+    }
+
+    @GetMapping("/nytdelprojekt")
+    public String createNewSubProject() {
+        return "nytdelprojekt";
+    }
+
 
 
     @GetMapping("/projektdetaljer/{projectId}/{ownerId}")
@@ -75,49 +90,52 @@ public class ProjectController {
         return "redirect:/projekter";
     }
 
-    @GetMapping("/administrerprojekt")
+    @GetMapping("/projektmedlemmer")
     public String adminProject(HttpSession session, Model model) {
+        Project project = projectRepo.getProject((int) session.getAttribute("projectId"));
         List<User> userList = userRepo.getUserList((int) session.getAttribute("projectId"));
         model.addAttribute("userlist", userList);
-        return "administrerprojekt";
+        model.addAttribute("project", project);
+        return "Projektmedlemmer";
     }
 
     //Fjerner bruger fra projekt brugerliste
-    @PostMapping("/fjernbruger/{userId}")
-    public String removeUserFromProject(@PathVariable("userId") int userId, HttpSession session){
+    @PostMapping("/fjernbruger")
+    public String removeUserFromProject(@RequestParam("userId") int userId, HttpSession session){
         projectRepo.removeUser(userId, (int) session.getAttribute("projectId"));
-        return "redirect:/administrerprojekt";
+        return "redirect:/projektmedlemmer";
     }
 
-    @PostMapping("/tilfojbruger")
-    public String addUserToUserList(WebRequest request, HttpSession session) {
-        if (request != null) {
-            int userId = userRepo.getUserId(request.getParameter("username"));
+    @PostMapping("/tilføjbruger")
+    public String addUserToUserList(@RequestParam("username") String username, HttpSession session) {
+        //Undersøg om request = null og om brugeren eksister før brugeren bliver tilføjet til projekt
+        if (username != null && userRepo.checkIfUserExists(username)) {
+            int userId = userRepo.getUserId(username);
             projectRepo.addUserToProject(userId, (int) session.getAttribute("projectId"));
         }
-        return "redirect:/administrerprojekt";
+        return "redirect:/projektmedlemmer";
     }
 
-    @PostMapping("/edittask")
+    @PostMapping("/redigeropgave")
     public String editTask(@RequestParam("taskId") int taskId, Model model) {
         model.addAttribute("task", projectRepo.getTask(taskId));
         return "redigeropgave";
     }
 
 
-    @PostMapping("/updatetask/{taskId}")
-    public String updateTask(@PathVariable("taskId") int taskId, @ModelAttribute("task") Task updatedTask) {
+    @PostMapping("/opdateropgave")
+    public String updateTask(@RequestParam("taskId") int taskId, @ModelAttribute("task") Task updatedTask) {
         Task existingTask = projectRepo.getTask(taskId);
         existingTask.setTimeEstimate(updatedTask.getTimeEstimate());
         existingTask.setTaskDescription(updatedTask.getTaskDescription());
         projectRepo.updateTask(existingTask);
-        return "redirect:/ejer";
+        return "redirect:/projekt";
     }
 
-    @PostMapping("/deletetask/{taskId}")
-    public String deleteTask(@PathVariable("taskId") int taskId) {
+    @PostMapping("/sletopgave")
+    public String deleteTask(@RequestParam("taskId") int taskId) {
         projectRepo.deleteTask(taskId);
-        return "redirect:/ejer";
+        return "redirect:/projekt";
     }
 
     @GetMapping("/delprojekt/{subProjectId}")
@@ -159,6 +177,169 @@ public class ProjectController {
         return "redirect:/ejer";
     }
 
+    @PostMapping("/nyopgave")
+    public String newTask(@RequestParam("taskName") String taskName,
+                          @RequestParam("description") String description,
+                          @RequestParam("start") String start,
+                          @RequestParam("deadline") String deadline,
+                          @RequestParam("timeestimate") int timeEstimate,
+                          HttpSession session) {
+        DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        try {
+            Task newTask = new Task();
+            LocalDate startDate = LocalDate.parse(start, format);
+            LocalDate deadlineDate = LocalDate.parse(deadline, format);
+            newTask.setTaskName(taskName);
+            newTask.setTaskDescription(description);
+            newTask.setProjectId((int) session.getAttribute("projectId"));
+            newTask.setStart(startDate);
+            newTask.setDeadline(deadlineDate);
+            newTask.setTimeEstimate(timeEstimate);
+            projectRepo.createTask(newTask);
+        } catch (DateTimeParseException e){
+            e.printStackTrace();
+            return "redirect:/nyopgave";
+        }
+        return "redirect:/projekt";
+
+    }
+
+    @PostMapping("/sletprojekt")
+    public String deleteProject(@RequestParam("projectId") int projectId) {
+        projectRepo.deleteProject(projectId);
+        return "redirect:/projekter";
+    }
+
+    @PostMapping("/opdaterprojekt")
+    public String updateProject(@RequestParam("description") String description,
+                                @RequestParam("start") String start,
+                                @RequestParam("deadline") String deadline,
+                                @RequestParam("projectId") int projectId) {
+        DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        try {
+            Project project = new Project();
+            LocalDate startDate = LocalDate.parse(start, format);
+            LocalDate deadlineDate = LocalDate.parse(deadline, format);
+            project.setProjectId(projectId);
+            project.setStart(startDate);
+            project.setDeadline(deadlineDate);
+            project.setProjectDescription(description);
+            projectRepo.updateProject(project);
+        } catch (DateTimeParseException e){
+            e.printStackTrace();
+            return "redirect:/redigerprojekt";
+        }
+        return "redirect:/projekter";
+    }
+
+    @PostMapping("/nydelopgave")
+    public String newSubTask(@RequestParam("subTaskName") String subTaskName,
+                          @RequestParam("description") String description,
+                          @RequestParam("start") String start,
+                          @RequestParam("deadline") String deadline,
+                          @RequestParam("timeestimate") int timeEstimate,
+                          HttpSession session) {
+        DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        try {
+            SubTask newSubTask = new SubTask();
+            LocalDate startDate = LocalDate.parse(start, format);
+            LocalDate deadlineDate = LocalDate.parse(deadline, format);
+            newSubTask.setSubTaskName(subTaskName);
+            newSubTask.setSubTaskDescription(description);
+            newSubTask.setSubProjectId((int) session.getAttribute("subprojectid"));
+            newSubTask.setStart(startDate);
+            newSubTask.setDeadline(deadlineDate);
+            newSubTask.setTimeEstimate(timeEstimate);
+            projectRepo.createSubTask(newSubTask);
+        } catch (DateTimeParseException e){
+            e.printStackTrace();
+            return "redirect:/nydelopgave";
+        }
+        return "redirect:/delprojekt";
+
+    }
+
+
+    @PostMapping("/nytdelprojekt")
+    public String createSubProject(@RequestParam("subProjectName") String subProjectName,
+                                @RequestParam("start") String start,
+                                @RequestParam("deadline") String deadline,
+                                @RequestParam("description") String description,
+                                HttpSession session) {
+        DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        try {
+            SubProject newSubProject = new SubProject();
+            LocalDate startDate = LocalDate.parse(start, format);
+            LocalDate deadlineDate = LocalDate.parse(deadline, format);
+            newSubProject.setProjectId((int) session.getAttribute("projectId"));
+            newSubProject.setSubProjectName(subProjectName);
+            newSubProject.setStart(startDate);
+            newSubProject.setDeadline(deadlineDate);
+            newSubProject.setSubProjectDescription(description);
+            projectRepo.dbAddSubProject(newSubProject);
+        } catch (DateTimeParseException e){
+            e.printStackTrace();
+            return "redirect:/nytdelprojekt";
+        }
+        return "redirect:/projekt";
+    }
+
+    @PostMapping("/redigerprojekt")
+    public String editProject(@RequestParam("projectId") int projectId, Model model) {
+        model.addAttribute("project", projectRepo.getProject(projectId));
+        return "redigerprojekt";
+    }
+
+
+
+    @PostMapping("/bekræft")
+    public String confirmProjectDeletion(@RequestParam("projectId") int projectId, Model model){
+        model.addAttribute("projectId", projectId);
+        return "bekræftsletning";
+    }
+
+
+
+    @PostMapping("/forladprojekt")
+    public String leaveproject(@RequestParam("projectId") int projectId,
+                               HttpSession session) {
+        projectRepo.removeUser((int) session.getAttribute("userId"), projectId);
+        return "redirect:/projekter";
+    }
+
+    @PostMapping("/sletdelprojekt")
+    public String deleteSubProject(@RequestParam("subProjectId") int subProjectId) {
+        projectRepo.deleteSubProject(subProjectId);
+        return "redirect:/projekt";
+    }
+
+    @PostMapping("/redigerdelprojekt")
+    public String editSubProject(@RequestParam("subProjectId") int subProjectId, Model model) {
+        model.addAttribute("subproject", projectRepo.getSubProject(subProjectId));
+        return "redigerdelprojekt";
+    }
+
+    @PostMapping("/opdaterdelprojekt")
+    public String updateSubProject(@RequestParam("description") String description,
+                                @RequestParam("start") String start,
+                                @RequestParam("deadline") String deadline,
+                                @RequestParam("subProjectId") int subProjectId) {
+        DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        try {
+            SubProject subProject = new SubProject();
+            LocalDate startDate = LocalDate.parse(start, format);
+            LocalDate deadlineDate = LocalDate.parse(deadline, format);
+            subProject.setSubProjectId(subProjectId);
+            subProject.setStart(startDate);
+            subProject.setDeadline(deadlineDate);
+            subProject.setSubProjectDescription(description);
+            projectRepo.updateSubProject(subProject);
+        } catch (DateTimeParseException e){
+            e.printStackTrace();
+            return "redirect:/redigerdelprojekt";
+        }
+        return "redirect:/projekt";
+    }
 
 
 }

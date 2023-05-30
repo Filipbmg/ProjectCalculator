@@ -21,8 +21,11 @@
         <a><h1>Projekt-Manager</h1></a>
     </div>
 
-    <a th:href="@{projekter}"><button type="button">Projektliste</button></a>
-    <a th:href="@{projekt}"><button type="button">Tilbage Til Projekt</button></a>
+    <div class="menu">
+        <a th:href="@{projekter}">Projektliste</a>
+        <a th:href="@{projekt}">Tilbage Til Projekt</a>
+    </div>
+
 
     <form action="/logout" method="POST">
         <button type="submit" class="logout-button">Log af</button>
@@ -44,23 +47,21 @@
                 <td th:text="${user.firstName}"></td>
                 <td th:text="${user.lastName}"></td>
                 <td>
-                    <form th:action="@{/fjernbruger/{userId}(userId=${user.userId})}" method="post">
+                    <form action="/fjernbruger" method="post">
                         <input type="hidden" name="userId" th:value="${user.userId}" />
-                        <button type="submit" class="remove-button">X</button>
+                        <button type="submit" class="logout-button">X</button>
                     </form>
                 </td>
 
             </tr>
             </tbody>
         </table>
-        <form th:action="@{/tilfojbruger}" method="post">
-            <label for="username" style="font-weight: bold;">Tilføj Bruger:</label>
+        <form action="/tilføjbruger" method="post">
+            <label for="username" style="font-weight: bold; padding-left: 8px;">Tilføj Bruger:</label>
             <input type="text" id="username" name="username" placeholder="Brugernavn"/>
             <button type="submit" class="button">Tilføj Bruger</button>
         </form>
-
     </div>
-
 </div>
 </body>
 </html>

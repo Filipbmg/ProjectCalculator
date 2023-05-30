@@ -42,16 +42,16 @@ public class UserController {
         while (paramNames.hasNext()) {
             String paramName = paramNames.next();
             String paramValue = request.getParameter(paramName);
-            if (paramValue == null || paramValue.isEmpty()) {
-                model.addAttribute("errormessage", "Felterne må ikke være tomme");
+            if (paramValue == null || paramValue.isEmpty() || paramValue.contains(" ")) {
+                model.addAttribute("errormessage", "Felterne må ikke være tomme eller indeholde mellemrum");
                 return "fejlunderoprettelse";
             }
         }
         User newUser = new User();
         newUser.setUsername(request.getParameter("username"));
         newUser.setPassword(request.getParameter("password"));
-        newUser.setPassword(request.getParameter("firstname"));
-        newUser.setPassword(request.getParameter("lastname"));
+        newUser.setFirstName(request.getParameter("firstname"));
+        newUser.setLastName(request.getParameter("lastname"));
 
 
         //Undersøger om brugernavn eller kodeord er for kort -> Check om brugernavn er taget -> Opret bruger
@@ -59,7 +59,7 @@ public class UserController {
             model.addAttribute("errormessage", "Brugernavn og kodeord skal være på minimum 3 tegn");
             return "fejlunderoprettelse";
         } else {
-            if (userRepo.checkIfDup(newUser.getUsername())) {
+            if (userRepo.checkIfUserExists(newUser.getUsername())) {
                 model.addAttribute("errorMessage", "Brugernavnet er taget");
                 return "fejlunderoprettelse";
             } else {

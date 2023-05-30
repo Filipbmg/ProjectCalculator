@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="da" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" th:href="@{css/style.css}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@400;700&display=swap" rel="stylesheet">
+  <title>Opgave</title>
+  <style>
+    body {
+      font-family: 'Source Sans Pro', sans-serif;
+      background-color: #f0f2f5;
+    }
+  </style>
+</head>
+<body>
+<div class="navbar">
+  <div class="logo">
+    <a><h1>Projekt-Manager</h1></a>
+  </div>
+  <form action="/logout" method="POST">
+    <button type="submit" class="logout-button">Log af</button>
+  </form>
+</div>
+
+<div class="main">
+  <div class="container">
+    <h2 th:text="${subtask.subTaskName}"></h2>
+    <form th:action="@{/updatesubtask/{subTaskId}(subTaskId=${subtask.subTaskId})}" th:object="${subtask}" method="post">
+      <label for="timeestimate">Forventet Tidskrav(hele timer)</label>
+      <input type="text" id="timeestimate" th:field="*{timeEstimate}" />
+      <label for="description">Opgave Beskrivelse</label>
+      <input type="text" id="description" th:field="*{subTaskDescription}" />
+      <input type="hidden" th:value="*{subTaskName}" />
+      <input type="hidden" th:value="*{start}" />
+      <input type="hidden" th:value="*{deadline}" />
+      <button type="submit">Opdater Opgave</button>
+    </form>
+    <form th:action="@{/deletesubtask/{subTaskId}(subTaskId=${subtask.subTaskId})}" method="post">
+      <input type="hidden" th:value="*{subtask.subTaskId}" />
+      <button type="submit">Slet Opgave</button>
+    </form>
+  </div>
+</div>
+</body>
+</html>
