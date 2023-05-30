@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="da" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" th:href="@{css/style.css}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@400;700&display=swap" rel="stylesheet">
+    <title>Delprojekt</title>
+    <style>
+        body {
+            font-family: 'Source Sans Pro', sans-serif;
+            background-color: #f0f2f5;
+        }
+    </style>
+</head>
+<body>
+<div class="navbar">
+    <div class="logo">
+        <a><h1>Projekt-Manager</h1></a>
+    </div>
+
+    <div class="menu">
+        <a th:href="@{projekter}">Projektliste</a>
+        <a th:href="@{nydelopgave}">Opret Opgave</a>
+        <a th:href="@{projekt}">Tilbage Til Projekt</a>
+    </div>
+
+    <form action="/logout" method="POST">
+        <button type="submit" class="logout-button">Log af</button>
+    </form>
+</div>
+<div class="main">
+    <span th:text="${subproject.subProjectName}"></span>
+    <span th:text="${subproject.subProjectDescription}"></span>
+    <span th:text="${#temporals.format(subproject.start, 'dd-MM-yyyy')}"></span>
+    <span th:text="${#temporals.format(subproject.deadline, 'dd-MM-yyyy')}"></span>
+    <span th:text="${subproject.timeEstimate}"></span>
+    <span th:text="${hoursperday}"></span>
+
+
+    <h2>Opgaver</h2>
+    <div class="list">
+        <table>
+            <thead>
+            <tr>
+                <th>Navn</th>
+                <th>Start</th>
+                <th>Deadline</th>
+                <th>Time Estimat</th>
+                <th>Beskrivelse</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="subtask : ${subtasks}">
+                <td th:text="${subtask.subTaskName}"></td>
+                <td th:text="${#temporals.format(subtask.start, 'dd-MM-yyyy')}"></td>
+                <td th:text="${#temporals.format(subtask.deadline, 'dd-MM-yyyy')}"></td>
+                <td th:text="${subtask.timeEstimate}"></td>
+                <td th:text="${subtask.subTaskDescription}"></td>
+                <td>
+                    <form action="/redigerdelopgave" method="POST">
+                        <input type="hidden" name="subTaskId" th:value="${subtask.subTaskId}" />
+                        <button type="submit">Rediger</button>
+                    </form>
+                </td>
+                <td>
+                    <form action="/sletdelopgave" method="POST">
+                        <input type="hidden" name="subTaskId" th:value="${task.taskId}" />
+                        <button type="submit" class="logout-button">Slet</button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="da" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" th:href="@{css/style.css}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@400;700&display=swap" rel="stylesheet">
+    <title>Nyt Projekt</title>
+    <style>
+        body {
+            font-family: 'Source Sans Pro', sans-serif;
+            background-color: #f0f2f5;
+        }
+    </style>
+</head>
+<body>
+<div class="navbar">
+    <div class="logo">
+        <a><h1>Projekt-Manager</h1></a>
+    </div>
+
+    <div class="menu">
+        <a th:href="@{projekter}">Projektliste</a>
+        <a th:href="@{delprojekt}">Tilbage Til Delprojekt</a>
+    </div>
+
+    <form action="/logout" method="POST">
+        <button type="submit" class="logout-button">Log af</button>
+    </form>
+</div>
+<div class="main">
+    <div class="container">
+        <form action="/nytdelprojekt" method="POST">
+            <div>
+                <label for="projectName">Delprojekt Navn</label>
+                <input type="text" id="projectName" name="subProjectName" required placeholder="Delprojekt Beskrivelse">
+            </div>
+            <div>
+                <label for="description">Delprojekt Beskrivelse</label>
+                <input type="text" id="description" name="description" required placeholder="Delprojekt Beskrivelse">
+            </div>
+            <div>
+                <label for="start">Start Dato</label>
+            </div>
+            <div>
+                <input type="date" id="start" name="start" required>
+            </div>
+            <div>
+                <label for="deadline">Deadline</label>
+            </div>
+            <div>
+                <input type="date" id="deadline" name="deadline" required>
+            </div>
+            <div style="margin-top: 10px;">
+                <button type="submit" value="Opret Delprojekt">Opret Delprojekt</button>
+            </div>
+        </form>
+    </div>
+
+</div>
+</body>
+</html>

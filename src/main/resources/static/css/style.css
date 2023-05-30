@@ -18,6 +18,16 @@ h1 {
     font-size: 52px;
     color: lightseagreen;
 }
+
+.navbar .menu {
+    padding-right: 10px;
+    font-size: 20px;
+}
+
+.navbar .menu a {
+    padding-right: 8px;
+}
+
 .container {
     max-width: 365px;
     margin: auto;
@@ -29,13 +39,11 @@ h1 {
 }
 .list {
     margin: auto;
-    padding-left: 20px;
-    padding-right: 20px;
     background-color: white;
     box-shadow: 0 2px 4px rgba(0, 0, 0, .1), 0 8px 16px rgba(0, 0, 0, .1);
     border-radius: 8px;
-    text-align: left;
-    float: left;
+    display: inline-block;
+    max-width: 1000px;
 }
 
 ul {
@@ -70,13 +78,33 @@ button[type="submit"] {
 }
 a {
     text-decoration: none;
+    color: lightseagreen;
+    font-weight: bold;
+}
+a:hover {
+    color: #188883;
 }
 
-#del a {
-
-    text-decoration: none;
-    color: white;
+.list table td {
+    text-align: left;
 }
+.list table td {
+    text-align: left;
+    padding: 25px;
+    word-break: break-all;
+    max-width: 400px;
+}
+
+.list input[type="text"],
+.list button {
+    width: auto;
+    flex-grow: 1;
+}
+.list form {
+    display: flex;
+    flex-direction: column;
+}
+
 button[type="submit"]:hover {
     background-color: #188883;
 }

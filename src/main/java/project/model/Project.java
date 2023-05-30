@@ -7,12 +7,9 @@ public class Project {
     private String projectName;
     private String projectDescription;
     private int ownerId;
+    private LocalDate start;
     private LocalDate deadline;
     private int timeEstimate;
-
-
-
-
 
     //Getters & Setters
 
@@ -46,6 +43,14 @@ public class Project {
 
     public void setOwnerId(int ownerId) {
         this.ownerId = ownerId;
+    }
+
+    public LocalDate getStart() {
+        return start;
+    }
+
+    public void setStart(LocalDate start) {
+        this.start = start;
     }
 
     public LocalDate getDeadline() {

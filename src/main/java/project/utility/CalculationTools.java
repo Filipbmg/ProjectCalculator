@@ -4,28 +4,26 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 
 public class CalculationTools {
-    public static int projectHoursPerDay(int timeEstimate, LocalDate projectDeadline) {
-        LocalDate today = LocalDate.now();
-        int weekdayCounter = 0;
-        while(!today.isAfter(projectDeadline)) {
-            if (today.getDayOfWeek() != DayOfWeek.SATURDAY &&  today.getDayOfWeek() != DayOfWeek.SUNDAY) {
-                weekdayCounter++;
-            }
-            today = today.plusDays(1);
-        }
-        return (int) Math.ceil((double) timeEstimate / weekdayCounter);
-    }
 
-    public static int subprojectHoursPerDay(int timeEstimate, LocalDate subprojectStart, LocalDate subprojectDeadline) {
+    //Dividerer tids estimatet med antallet af hverdage mellem projekt start og deadline.
+    public static int projectHoursPerDay(int timeEstimate, LocalDate start, LocalDate deadline) {
+
         LocalDate today = LocalDate.now();
         LocalDate calculationDate;
         int weekdayCounter = 0;
-        if (today.isAfter(subprojectStart)) {
+
+        //Hvis deadline er før start eller er overskredet, så giver den 0
+        if (deadline.isBefore(start) || deadline.isBefore(today)) {
+            return 0;
+        }
+
+        //Hvis idag er en senere dato end projekt start, så bruger den idag i stedet
+        if (today.isAfter(start)) {
             calculationDate = today;
         } else {
-            calculationDate = subprojectStart;
+            calculationDate = start;
         }
-        while(!calculationDate.isAfter(subprojectDeadline)) {
+        while(!calculationDate.isAfter(deadline)) {
             if (calculationDate.getDayOfWeek() != DayOfWeek.SATURDAY &&  calculationDate.getDayOfWeek() != DayOfWeek.SUNDAY) {
                 weekdayCounter++;
             }

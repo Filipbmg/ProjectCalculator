@@ -9,7 +9,6 @@ import project.model.Project;
 import project.utility.ConnectionManager;
 
 import java.sql.*;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,15 +28,14 @@ public class UserRepository {
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(1);
         return encoder.encode(password);
     }
-
-    public boolean checkIfDup(User user) {
+    public boolean checkIfUserExists(String newUsername) {
         try {
             //connect to db
             Connection connection = ConnectionManager.getConnection(dbUrl, username, password);
             PreparedStatement preparedStatement = connection.prepareStatement("SELECT username FROM users WHERE username = ?");
 
-            //set attribute in prepared statement
-            preparedStatement.setString(1, user.getUsername());
+            //set attributer i prepared statement
+            preparedStatement.setString(1, newUsername);
 
             //execute
             ResultSet result = preparedStatement.executeQuery();
@@ -52,7 +50,7 @@ public class UserRepository {
 
     public void addUser(User user){
         try{
-            //connect to db
+            //connect til db
             Connection connection = ConnectionManager.getConnection(dbUrl, username, password);
 
             PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO users(username, password, first_name, last_name) VALUES (?, ?, ?, ?)");
@@ -70,16 +68,16 @@ public class UserRepository {
         }
     }
 
-    public boolean verifyLogin(User user) {
-        passwordEncoder(user.getPassword());
+    public boolean verifyLogin(String verifyUsername, String verifyPassword) {
+        String encodedPassword = passwordEncoder(verifyPassword);
         try{
-            //connect to db
+            //connect til db
             Connection connection = ConnectionManager.getConnection(dbUrl, username, password);
             PreparedStatement preparedStatement = connection.prepareStatement("SELECT username, password FROM users WHERE username = ? AND password = ?");
 
-            //set attribute in prepared statement
-            preparedStatement.setString(1, user.getUsername());
-            preparedStatement.setString(2, user.getPassword());
+            //set attributer i prepared statement
+            preparedStatement.setString(1, verifyUsername);
+            preparedStatement.setString(2, encodedPassword);
 
             //execute
             ResultSet result = preparedStatement.executeQuery();
@@ -91,49 +89,15 @@ public class UserRepository {
         return false;
     }
 
-    public List<Project> getProjects(User user){
-        List<Project> projectList = new ArrayList<>();
-        try{
-            //connect to db
-            Connection connection = ConnectionManager.getConnection(dbUrl, username, password);
-
-            //Brug brugernavn til at få projekt id, navn og projekt ejer id på alle projekter brugeren er en del af
-            String query = "SELECT projects.id, projects.project_name, projects.owner_id, projects.deadline FROM projects " +
-                    "JOIN project_users ON projects.id = project_users.project_id " +
-                    "JOIN users ON project_users.user_id = users.id " +
-                    "WHERE users.username = ? " +
-                    "ORDER BY projects.deadline";
-            PreparedStatement preparedStatement = connection.prepareStatement(query);
-            preparedStatement.setString(1, user.getUsername());
-            ResultSet projectResults = preparedStatement.executeQuery();
-            while (projectResults.next()) {
-                int projectId = projectResults.getInt("id");
-                String projectName = projectResults.getString("project_name");
-                int ownerId = projectResults.getInt("owner_id");
-                LocalDate deadline = projectResults.getDate("deadline").toLocalDate();
-                Project projectInfo = new Project();
-                projectInfo.setProjectId(projectId);
-                projectInfo.setProjectName(projectName);
-                projectInfo.setOwnerId(ownerId);
-                projectInfo.setDeadline(deadline);
-                projectList.add(projectInfo);
-            }
-            return projectList;
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return projectList;
-    }
-
-    public int getUserId(User user) {
+    public int getUserId(String loggedinUsername) {
         int userId = 0;
         try {
-            //connect to db
+            //connect til db
             Connection connection = ConnectionManager.getConnection(dbUrl, username, password);
             PreparedStatement preparedStatement = connection.prepareStatement("SELECT id FROM users WHERE username = ?");
 
-            //set attribute in prepared statement
-            preparedStatement.setString(1, user.getUsername());
+            //set attribut i prepared statement
+            preparedStatement.setString(1, loggedinUsername);
 
             //execute
             ResultSet result = preparedStatement.executeQuery();
@@ -145,6 +109,33 @@ public class UserRepository {
             e.printStackTrace();
         }
         return userId;
+    }
+
+    public List<User> getUserList(int projectId) {
+        List<User> userList = new ArrayList<>();
+        try{
+            //connect to db
+            Connection connection = ConnectionManager.getConnection(dbUrl, username, password);
+
+            //Brug projekt ID til at få en liste af tilknyttede brugere
+            String query = "SELECT users.id, users.first_name, users.last_name FROM users, project_users " +
+                    "WHERE users.id = project_users.user_id " +
+                    "AND project_users.project_id = ?";
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+            preparedStatement.setInt(1, projectId);
+            ResultSet userResults = preparedStatement.executeQuery();
+            while (userResults.next()) {
+                User userInfo = new User();
+                userInfo.setUserId(userResults.getInt("id"));
+                userInfo.setFirstName(userResults.getString("first_name"));
+                userInfo.setLastName(userResults.getString("last_name"));
+                userList.add(userInfo);
+            }
+            return userList;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return userList;
     }
 
 }

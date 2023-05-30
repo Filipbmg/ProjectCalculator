@@ -1,12 +1,26 @@
 package project.model;
 
 public class User {
+
+    private int userId;
     private String username;
     private String password;
     private String firstName;
     private String lastName;
 
+
+
+
     //Getters & Setters
+
+    public int getUserId() {
+        return userId;
+    }
+
+    public void setUserId(int userId) {
+        this.userId = userId;
+    }
+
     public String getUsername() {
         return username;
     }
