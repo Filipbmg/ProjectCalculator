@@ -66,6 +66,7 @@ public class UserController {
                 model.addAttribute("errorMessage", "Brugernavnet er taget");
                 return "fejlunderoprettelse";
             } else {
+                newUser.setPassword(userRepo.passwordEncoder(newUser.getPassword()));
                 userRepo.addUser(newUser);
                 return "redirect:/";
             }

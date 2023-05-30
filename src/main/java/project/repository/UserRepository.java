@@ -2,6 +2,7 @@ package project.repository;
 
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Repository;
 import project.model.User;
 import project.model.Project;
@@ -22,6 +23,11 @@ public class UserRepository {
     @Value("${spring.datasource.password}")
     private String password;
 
+    //Højere tal = stærkere encryption, vi holder den på 1 i denne omgang.
+    public String passwordEncoder (String password) {
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(1);
+        return encoder.encode(password);
+    }
     public boolean checkIfUserExists(String newUsername) {
         try {
             //connect to db
@@ -63,6 +69,7 @@ public class UserRepository {
     }
 
     public boolean verifyLogin(String verifyUsername, String verifyPassword) {
+        String encodedPassword = passwordEncoder(verifyPassword);
         try{
             //connect til db
             Connection connection = ConnectionManager.getConnection(dbUrl, username, password);
@@ -70,7 +77,7 @@ public class UserRepository {
 
             //set attributer i prepared statement
             preparedStatement.setString(1, verifyUsername);
-            preparedStatement.setString(2, verifyPassword);
+            preparedStatement.setString(2, encodedPassword);
 
             //execute
             ResultSet result = preparedStatement.executeQuery();
