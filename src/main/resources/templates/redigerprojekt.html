@@ -32,10 +32,10 @@
 </div>
 <div class="main">
     <div class="container">
-        <form action="/opdaterprojekt" method="post">
+        <form action="/opdaterprojekt" th:object="${project}" method="post">
             <div>
                 <label for="description">Projekt Beskrivelse</label>
-                <input type="text" id="description" name="description" required>
+                <input type="text" id="description" name="description" th:field="${project.projectDescription}" required>
             </div>
             <div>
                 <label for="start">Start Dato</label>
