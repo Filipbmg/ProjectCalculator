@@ -2,15 +2,16 @@ package project.repository;
 
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Repository;
 import project.model.User;
-import project.model.Project;
 import project.utility.ConnectionManager;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+// Fjernet for at gøre test data nemmere tilgængeligt
+// import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 @Repository
 public class UserRepository {
@@ -23,11 +24,11 @@ public class UserRepository {
     @Value("${spring.datasource.password}")
     private String password;
 
-    //Højere tal = stærkere encryption, vi holder den på 1 i denne omgang.
-    public String passwordEncoder (String password) {
-        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(1);
-        return encoder.encode(password);
-    }
+    ////Fjernet kryptering for at gøre testdata nemmere tilgængeligt
+    //public String passwordEncoder (String password) {
+        //BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(10);
+        //return encoder.encode(password);
+    //}
     public boolean checkIfUserExists(String newUsername) {
         try {
             //connect to db
@@ -68,21 +69,30 @@ public class UserRepository {
         }
     }
 
-    public boolean verifyLogin(String verifyUsername, String verifyPassword) {
-        String encodedPassword = passwordEncoder(verifyPassword);
+    public boolean verifyLogin(String userUsername, String userPassword) {
+        //Fjernet kryptering for at gøre testdata nemmere tilgængeligt
+        //BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(10);
         try{
             //connect til db
             Connection connection = ConnectionManager.getConnection(dbUrl, username, password);
-            PreparedStatement preparedStatement = connection.prepareStatement("SELECT username, password FROM users WHERE username = ? AND password = ?");
+            PreparedStatement preparedStatement = connection.prepareStatement("SELECT password FROM users WHERE username = ?");
 
             //set attributer i prepared statement
-            preparedStatement.setString(1, verifyUsername);
-            preparedStatement.setString(2, encodedPassword);
+            preparedStatement.setString(1, userUsername);
 
             //execute
             ResultSet result = preparedStatement.executeQuery();
+            if (result.next()) {
+                String dbPassword = result.getString("password");
+                //Fjernet kryptering for at gøre testdata nemmere tilgængeligt
+                //return encoder.matches(userPassword, dbPassword);
+                //erstatningsløsning
+                if(Objects.equals(dbPassword, userPassword)) {
+                    return true;
+                }
+            }
 
-            return result.next();
+            return false;
         } catch (SQLException e) {
             e.printStackTrace();
         }

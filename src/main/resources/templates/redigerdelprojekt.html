@@ -23,7 +23,7 @@
 
   <div class="menu">
     <a th:href="@{projekter}">Projektliste</a>
-    <a th:href="@{delprojekt}">Tilbage Til Delprojekt</a>
+    <a th:href="@{projekt}">Tilbage Til Projekt</a>
   </div>
 
 
@@ -33,10 +33,10 @@
 </div>
 <div class="main">
   <div class="container">
-    <form action="/opdaterdelprojekt" method="post">
+    <form action="/opdaterdelprojekt" th:object="${subproject}" method="post">
       <div>
         <label for="description">Delprojekt Beskrivelse</label>
-        <input type="text" id="description" name="description" required>
+        <input type="text" id="description" name="description" th:field="*{subProjectDescription}" required>
       </div>
       <div>
         <label for="start">Start Dato</label>

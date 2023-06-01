@@ -5,9 +5,7 @@ import org.springframework.stereotype.Repository;
 import project.model.*;
 import project.utility.ConnectionManager;
 
-import javax.xml.transform.Result;
 import java.sql.*;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 

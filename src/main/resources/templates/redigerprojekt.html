@@ -35,7 +35,7 @@
         <form action="/opdaterprojekt" th:object="${project}" method="post">
             <div>
                 <label for="description">Projekt Beskrivelse</label>
-                <input type="text" id="description" name="description" th:field="${project.projectDescription}" required>
+                <input type="text" id="description" name="description" th:field="*{projectDescription}" required>
             </div>
             <div>
                 <label for="start">Start Dato</label>

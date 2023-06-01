@@ -34,10 +34,18 @@
     </form>
 </div>
 <div class="main">
-    <span class="project-name" th:text="${project.projectName}">Project Name</span>
-    <span class="project-description" th:text="${project.projectDescription}">Project Description</span>
-    <span class="time-estimate" th:text="${project.timeEstimate}">Time Estimate</span>
-    <span class="hours-per-day" th:text="${hoursperday}">Hours Per Day</span>
+    <h1 th:text="${project.projectName}" ></h1>
+    <div>
+        <p><strong>Beskrivelse:</strong> <span th:text="${project.projectDescription}"></span></p>
+        <p><strong>Start Dato:</strong> <span th:text="${project.start}"></span> <strong>Deadline:</strong> <span th:text="${project.deadline}"></span></p>
+        <p><strong>Samlet Tidsestimat:</strong> <span th:text="${project.timeEstimate}"></span> timer</p>
+        <p>
+            <strong>Tidsestimat fordelt på arbejdsdage:</strong>
+            <span th:if="${hoursperday >= 0}" th:text="${hoursperday} + ' timer per arbejdsdag'"></span>
+            <span th:if="${hoursperday == -1}">Fejl: Deadline før start</span>
+            <span th:if="${hoursperday == -2}">Deadline overskredet</span>
+        </p>
+    </div>
 
 
     <h2>Opgaver</h2>
@@ -114,7 +122,7 @@
                     </form>
                 </td>
                 <td>
-                    <form action="/sletdelprojekt" method="POST">
+                    <form action="/bekræftsletdelprojekt" method="POST">
                         <input type="hidden" name="subProjectId" th:value="${subproject.subProjectId}" />
                         <button type="submit" class="logout-button">Slet</button>
                     </form>

@@ -5,9 +5,7 @@ import org.springframework.stereotype.Repository;
 import project.model.*;
 import project.utility.ConnectionManager;
 
-import javax.xml.transform.Result;
 import java.sql.*;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -118,28 +116,6 @@ public class ProjectRepository {
             e.printStackTrace();
         }
         return project;
-    }
-
-    public LocalDate getProjectDeadline(int projectId) {
-        LocalDate deadline = null;
-        try {
-            //connect to db
-            Connection connection = ConnectionManager.getConnection(dbUrl, username, password);
-
-            //Brug brugernavn til at få projekt id, navn og projekt ejer id på alle projekter brugeren er en del af
-            String query = "SELECT deadline FROM projects WHERE id = ?";
-            PreparedStatement preparedStatement = connection.prepareStatement(query);
-            preparedStatement.setInt(1, projectId);
-
-            ResultSet result = preparedStatement.executeQuery();
-            if (result.next()) {
-                deadline = result.getDate("deadline").toLocalDate();
-            }
-            return deadline;
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return deadline;
     }
 
     //Sletter brugers forbindelse til et projekt

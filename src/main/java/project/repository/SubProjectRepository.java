@@ -5,9 +5,7 @@ import org.springframework.stereotype.Repository;
 import project.model.*;
 import project.utility.ConnectionManager;
 
-import javax.xml.transform.Result;
 import java.sql.*;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -67,7 +65,7 @@ public class SubProjectRepository {
 
             ResultSet results = preparedStatement.executeQuery();
             if (results.next()) {
-                subproject.setSubProjectId(results.getInt("id"));
+                    subproject.setSubProjectId(results.getInt("id"));
                 subproject.setProjectId(results.getInt("project_id"));
                 subproject.setSubProjectName(results.getString("subproject_name"));
                 subproject.setSubProjectDescription(results.getString("subproject_description"));
@@ -109,8 +107,7 @@ public class SubProjectRepository {
             Connection connection = ConnectionManager.getConnection(dbUrl, username, password);
 
             //Initialiser prepared statement
-            PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO subprojects (subproject_name, project_id, start, deadline, subproject_description, time_estimate) VALUES (?, ?, ?, ?, ?, 0)",
-                    Statement.RETURN_GENERATED_KEYS);
+            PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO subprojects (subproject_name, project_id, start, deadline, subproject_description, time_estimate) VALUES (?, ?, ?, ?, ?, 0)");
 
             //set attributer i prepared statement
             preparedStatement.setString(1, subProject.getSubProjectName());
@@ -119,7 +116,6 @@ public class SubProjectRepository {
             preparedStatement.setDate(4, java.sql.Date.valueOf(subProject.getDeadline()));
             preparedStatement.setString(5, subProject.getSubProjectDescription());
 
-            //execute og tag det genereret project_id
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();

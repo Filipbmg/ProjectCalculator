@@ -32,12 +32,18 @@
     </form>
 </div>
 <div class="main">
-    <span th:text="${subproject.subProjectName}"></span>
-    <span th:text="${subproject.subProjectDescription}"></span>
-    <span th:text="${#temporals.format(subproject.start, 'dd-MM-yyyy')}"></span>
-    <span th:text="${#temporals.format(subproject.deadline, 'dd-MM-yyyy')}"></span>
-    <span th:text="${subproject.timeEstimate}"></span>
-    <span th:text="${hoursperday}"></span>
+    <h1 th:text="${subproject.subProjectName}" ></h1>
+    <div>
+        <p><strong>Beskrivelse:</strong> <span th:text="${subproject.subProjectDescription}"></span></p>
+        <p><strong>Start Dato:</strong> <span th:text="${subproject.start}"></span> <strong>Deadline:</strong> <span th:text="${subproject.deadline}"></span></p>
+        <p><strong>Samlet Tidsestimat:</strong> <span th:text="${subproject.timeEstimate}"></span> timer</p>
+        <p>
+            <strong>Tidsestimat fordelt på arbejdsdage:</strong>
+            <span th:if="${hoursperday >= 0}" th:text="${hoursperday} + ' timer per arbejdsdag'"></span>
+            <span th:if="${hoursperday == -1}">Fejl: Deadline før start</span>
+            <span th:if="${hoursperday == -2}">Deadline overskredet</span>
+        </p>
+    </div>
 
 
     <h2>Opgaver</h2>
@@ -67,7 +73,7 @@
                 </td>
                 <td>
                     <form action="/sletdelopgave" method="POST">
-                        <input type="hidden" name="subTaskId" th:value="${task.taskId}" />
+                        <input type="hidden" name="subTaskId" th:value="${subtask.subTaskId}" />
                         <button type="submit" class="logout-button">Slet</button>
                     </form>
                 </td>

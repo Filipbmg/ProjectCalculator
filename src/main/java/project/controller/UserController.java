@@ -66,7 +66,8 @@ public class UserController {
                 model.addAttribute("errorMessage", "Brugernavnet er taget");
                 return "fejlunderoprettelse";
             } else {
-                newUser.setPassword(userRepo.passwordEncoder(newUser.getPassword()));
+                //Fjernet kryptering for at gøre testdata nemmere tilgængeligt
+                //newUser.setPassword(userRepo.passwordEncoder(newUser.getPassword()));
                 userRepo.addUser(newUser);
                 return "redirect:/";
             }

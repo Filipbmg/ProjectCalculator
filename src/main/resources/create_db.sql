@@ -5,7 +5,7 @@ DROP TABLE IF EXISTS projectmanagerdb.users;
 CREATE TABLE projectmanagerdb.users (
 	`id` INT NOT NULL AUTO_INCREMENT,
 	`username` VARCHAR(35) NOT NULL,
-    `password` VARCHAR(35) NOT NULL,
+    `password` VARCHAR(90) NOT NULL,
     `first_name` VARCHAR(35) NOT NULL,
     `last_name` VARCHAR(35) NOT NULL,
 	PRIMARY KEY (`id`));
@@ -18,7 +18,7 @@ CREATE TABLE projectmanagerdb.projects (
     `project_description` VARCHAR(1000),
     `start` DATE NOT NULL,
     `deadline` DATE NOT NULL,
-    `time_estimate` INT NOT NULL,
+    `time_estimate` INT DEFAULT 0,
     PRIMARY KEY (`id`),
     FOREIGN KEY (`owner_id`) REFERENCES projectmanagerdb.users(`id`)
     ON DELETE CASCADE);
@@ -36,12 +36,12 @@ DROP TABLE IF EXISTS projectmanagerdb.tasks;
 CREATE TABLE projectmanagerdb.tasks ( 
 	`id` INT NOT NULL AUTO_INCREMENT,
 	`project_id` INT NOT NULL,
-    `task_name` VARCHAR(35),
+    `task_name` VARCHAR(35) NOT NULL,
     `task_description` VARCHAR(1000),
     `start` DATE,
     `deadline` DATE,
-    `time_estimate` INT NOT NULL,
-    PRIMARY KEY (`id`, `project_id`),
+    `time_estimate` INT DEFAULT 0,
+    PRIMARY KEY (`id`),
     FOREIGN KEY (`project_id`) REFERENCES projectmanagerdb.projects(`id`)
     ON DELETE CASCADE);
     
@@ -49,12 +49,12 @@ DROP TABLE IF EXISTS projectmanagerdb.subprojects;
 CREATE TABLE projectmanagerdb.subprojects (
 	`id` INT NOT NULL AUTO_INCREMENT,
 	`project_id` INT NOT NULL,
-    `subproject_name` VARCHAR(35),
+    `subproject_name` VARCHAR(35) NOT NULL,
     `subproject_description` VARCHAR(1000),
     `start` DATE,
     `deadline` DATE,
-    `time_estimate` INT NOT NULL,
-    PRIMARY KEY (`id`, `project_id`),
+    `time_estimate` INT DEFAULT 0,
+    PRIMARY KEY (`id`),
     FOREIGN KEY (`project_id`) REFERENCES projectmanagerdb.projects(`id`)
     ON DELETE CASCADE);
 
@@ -62,12 +62,12 @@ DROP TABLE IF EXISTS projectmanagerdb.subtasks;
 CREATE TABLE projectmanagerdb.subtasks (
 	`id` INT NOT NULL AUTO_INCREMENT,
 	`subproject_id` INT NOT NULL,
-    `subtask_name` VARCHAR(35),
+    `subtask_name` VARCHAR(35) NOT NULL,
     `subtask_description` VARCHAR(1000),
     `start` DATE,
     `deadline` DATE,
-    `time_estimate` INT NOT NULL,
-    PRIMARY KEY (`id`, `subproject_id`),
+    `time_estimate` INT DEFAULT 0,
+    PRIMARY KEY (`id`),
     FOREIGN KEY (`subproject_id`) REFERENCES projectmanagerdb.subprojects(`id`)
     ON DELETE CASCADE);
     
